@@ -1,0 +1,15 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+
+    <record id="action_report_workshop_work_order" model="ir.actions.report">
+        <field name="name">Work Dispatch Printout</field>
+        <field name="model">workshop.work.order</field>
+        <field name="report_type">qweb-pdf</field>
+        <field name="report_name">workshop_management.report_work_order</field>
+        <field name="report_file">workshop_management.report_work_order</field>
+        <field name="print_report_name">'Work Dispatch - %s' % (object.name)</field>
+        <field name="binding_model_id" ref="model_workshop_work_order"/>
+        <field name="binding_type">report</field>
+    </record>
+
+</odoo>

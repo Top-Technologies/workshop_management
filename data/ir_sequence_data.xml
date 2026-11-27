@@ -1,0 +1,78 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <data noupdate="1">
+
+        <!-- Customer Request Sequence: CR-00001 -->
+        <record id="seq_workshop_request" model="ir.sequence">
+            <field name="name">Customer Request</field>
+            <field name="code">workshop.request</field>
+            <field name="prefix">CR-</field>
+            <field name="padding">5</field>
+            <field name="company_id" eval="False"/>
+        </record>
+
+        <!-- Job Order Sequence: JO-00001 -->
+        <record id="seq_workshop_job_order" model="ir.sequence">
+            <field name="name">Workshop Job Order</field>
+            <field name="code">workshop.job.order</field>
+            <field name="prefix">JO-</field>
+            <field name="padding">5</field>
+            <field name="company_id" eval="False"/>
+        </record>
+
+        <!-- Work Order Sequence: WO-00001 -->
+        <record id="seq_workshop_work_order" model="ir.sequence">
+            <field name="name">Work Dispatch</field>
+            <field name="code">workshop.work.order</field>
+            <field name="prefix">WO-</field>
+            <field name="padding">5</field>
+            <field name="company_id" eval="False"/>
+        </record>
+
+        <!-- Spare Part Request Sequence: SPR-00001 -->
+        <record id="seq_workshop_spare_part_request" model="ir.sequence">
+            <field name="name">Spare Part Request</field>
+            <field name="code">workshop.spare.part.request</field>
+            <field name="prefix">SPR-</field>
+            <field name="padding">5</field>
+            <field name="company_id" eval="False"/>
+        </record>
+
+        <!-- Quality Inspection Sequence: QI-00001 -->
+        <record id="seq_workshop_quality_inspection" model="ir.sequence">
+            <field name="name">Quality Inspection</field>
+            <field name="code">workshop.quality.inspection</field>
+            <field name="prefix">QI-</field>
+            <field name="padding">5</field>
+            <field name="company_id" eval="False"/>
+        </record>
+
+        <!-- Field Visit Sequence: FV-00001 -->
+        <record id="seq_workshop_field_visit" model="ir.sequence">
+            <field name="name">Workshop Field Visit</field>
+            <field name="code">workshop.field.visit</field>
+            <field name="prefix">FV-</field>
+            <field name="padding">5</field>
+            <field name="company_id" eval="False"/>
+        </record>
+
+        <!-- Service Agreement Sequence: SA-00001 -->
+        <!-- Service Warranty Sequence: WAR-00001 -->
+        <record id="seq_workshop_warranty" model="ir.sequence">
+            <field name="name">Workshop Service Warranty</field>
+            <field name="code">workshop.warranty</field>
+            <field name="prefix">WAR-</field>
+            <field name="padding">5</field>
+            <field name="company_id" eval="False"/>
+        </record>
+
+        <record id="seq_workshop_expense" model="ir.sequence">
+            <field name="name">Workshop Field Expense</field>
+            <field name="code">workshop.expense</field>
+            <field name="prefix">EXP-</field>
+            <field name="padding">5</field>
+            <field name="company_id" eval="False"/>
+        </record>
+
+    </data>
+</odoo>

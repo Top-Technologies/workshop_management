@@ -1,0 +1,223 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <data noupdate="1">
+
+        <record id="intake_item_01" model="workshop.equipment.intake.item">
+            <field name="sequence">1</field>
+            <field name="name">Front Windshield</field>
+        </record>
+        <record id="intake_item_02" model="workshop.equipment.intake.item">
+            <field name="sequence">2</field>
+            <field name="name">Right Door Glass</field>
+        </record>
+        <record id="intake_item_03" model="workshop.equipment.intake.item">
+            <field name="sequence">3</field>
+            <field name="name">Left Door Glass</field>
+        </record>
+        <record id="intake_item_04" model="workshop.equipment.intake.item">
+            <field name="sequence">4</field>
+            <field name="name">Right and Left Side Mirrors</field>
+        </record>
+        <record id="intake_item_05" model="workshop.equipment.intake.item">
+            <field name="sequence">5</field>
+            <field name="name">Small Side Mirrors (Convex)</field>
+        </record>
+        <record id="intake_item_06" model="workshop.equipment.intake.item">
+            <field name="sequence">6</field>
+            <field name="name">Front Grille</field>
+        </record>
+        <record id="intake_item_07" model="workshop.equipment.intake.item">
+            <field name="sequence">7</field>
+            <field name="name">Engine Oil Cap</field>
+        </record>
+        <record id="intake_item_08" model="workshop.equipment.intake.item">
+            <field name="sequence">8</field>
+            <field name="name">Engine Oil Dipstick</field>
+        </record>
+        <record id="intake_item_09" model="workshop.equipment.intake.item">
+            <field name="sequence">9</field>
+            <field name="name">Fuel Tank Cap</field>
+        </record>
+        <record id="intake_item_10" model="workshop.equipment.intake.item">
+            <field name="sequence">10</field>
+            <field name="name">Radiator Cap</field>
+        </record>
+        <record id="intake_item_11" model="workshop.equipment.intake.item">
+            <field name="sequence">11</field>
+            <field name="name">Horn</field>
+        </record>
+        <record id="intake_item_12" model="workshop.equipment.intake.item">
+            <field name="sequence">12</field>
+            <field name="name">Battery Caps</field>
+        </record>
+        <record id="intake_item_13" model="workshop.equipment.intake.item">
+            <field name="sequence">13</field>
+            <field name="name">Front Left Turn Signal</field>
+        </record>
+        <record id="intake_item_14" model="workshop.equipment.intake.item">
+            <field name="sequence">14</field>
+            <field name="name">Front Right Turn Signal</field>
+        </record>
+        <record id="intake_item_15" model="workshop.equipment.intake.item">
+            <field name="sequence">15</field>
+            <field name="name">Side Turn Signals</field>
+        </record>
+        <record id="intake_item_16" model="workshop.equipment.intake.item">
+            <field name="sequence">16</field>
+            <field name="name">Power Steering Fluid Cap</field>
+        </record>
+        <record id="intake_item_17" model="workshop.equipment.intake.item">
+            <field name="sequence">17</field>
+            <field name="name">Tail Lights / Turn Signals</field>
+        </record>
+        <record id="intake_item_18" model="workshop.equipment.intake.item">
+            <field name="sequence">18</field>
+            <field name="name">Front Left Headlight</field>
+        </record>
+        <record id="intake_item_19" model="workshop.equipment.intake.item">
+            <field name="sequence">19</field>
+            <field name="name">Front Right Headlight</field>
+        </record>
+        <record id="intake_item_20" model="workshop.equipment.intake.item">
+            <field name="sequence">20</field>
+            <field name="name">Rear Left Tail Light</field>
+        </record>
+        <record id="intake_item_21" model="workshop.equipment.intake.item">
+            <field name="sequence">21</field>
+            <field name="name">Seats / Seat Belts</field>
+        </record>
+        <record id="intake_item_22" model="workshop.equipment.intake.item">
+            <field name="sequence">22</field>
+            <field name="name">Keys and Key Fob</field>
+        </record>
+        <record id="intake_item_23" model="workshop.equipment.intake.item">
+            <field name="sequence">23</field>
+            <field name="name">Wheel / Tire Wrenches</field>
+        </record>
+        <record id="intake_item_24" model="workshop.equipment.intake.item">
+            <field name="sequence">24</field>
+            <field name="name">Wheel Bolts / Nuts</field>
+        </record>
+        <record id="intake_item_25" model="workshop.equipment.intake.item">
+            <field name="sequence">25</field>
+            <field name="name">Tire Chains</field>
+        </record>
+        <record id="intake_item_26" model="workshop.equipment.intake.item">
+            <field name="sequence">26</field>
+            <field name="name">Spare Tire</field>
+        </record>
+        <record id="intake_item_27" model="workshop.equipment.intake.item">
+            <field name="sequence">27</field>
+            <field name="name">Interior Dome Light</field>
+        </record>
+        <record id="intake_item_28" model="workshop.equipment.intake.item">
+            <field name="sequence">28</field>
+            <field name="name">Door Handle / Lock</field>
+        </record>
+        <record id="intake_item_29" model="workshop.equipment.intake.item">
+            <field name="sequence">29</field>
+            <field name="name">Water Container / Tank</field>
+        </record>
+        <record id="intake_item_30" model="workshop.equipment.intake.item">
+            <field name="sequence">30</field>
+            <field name="name">Sun Visors</field>
+        </record>
+        <record id="intake_item_31" model="workshop.equipment.intake.item">
+            <field name="sequence">31</field>
+            <field name="name">Trailer Electrical Connector (Pin)</field>
+        </record>
+        <record id="intake_item_32" model="workshop.equipment.intake.item">
+            <field name="sequence">32</field>
+            <field name="name">Trailer Left Tail Light</field>
+        </record>
+        <record id="intake_item_33" model="workshop.equipment.intake.item">
+            <field name="sequence">33</field>
+            <field name="name">Trailer Right Tail Light</field>
+        </record>
+        <record id="intake_item_34" model="workshop.equipment.intake.item">
+            <field name="sequence">34</field>
+            <field name="name">Trailer Rear Light</field>
+        </record>
+        <record id="intake_item_35" model="workshop.equipment.intake.item">
+            <field name="sequence">35</field>
+            <field name="name">Reflectors (Trailer)</field>
+        </record>
+        <record id="intake_item_36" model="workshop.equipment.intake.item">
+            <field name="sequence">36</field>
+            <field name="name">Mudguards (Trailer)</field>
+        </record>
+        <record id="intake_item_37" model="workshop.equipment.intake.item">
+            <field name="sequence">37</field>
+            <field name="name">Vehicle Jack Handle</field>
+        </record>
+        <record id="intake_item_38" model="workshop.equipment.intake.item">
+            <field name="sequence">38</field>
+            <field name="name">Trailer Jack Handle</field>
+        </record>
+        <record id="intake_item_39" model="workshop.equipment.intake.item">
+            <field name="sequence">39</field>
+            <field name="name">Bus Right Side Window (Left portion)</field>
+        </record>
+        <record id="intake_item_40" model="workshop.equipment.intake.item">
+            <field name="sequence">40</field>
+            <field name="name">Bus Right Side Window (Right portion)</field>
+        </record>
+        <record id="intake_item_41" model="workshop.equipment.intake.item">
+            <field name="sequence">41</field>
+            <field name="name">Other Bus Window Glass</field>
+        </record>
+        <record id="intake_item_42" model="workshop.equipment.intake.item">
+            <field name="sequence">42</field>
+            <field name="name">Battery Holder / Box</field>
+        </record>
+        <record id="intake_item_43" model="workshop.equipment.intake.item">
+            <field name="sequence">43</field>
+            <field name="name">Spare Tire Carrier</field>
+        </record>
+        <record id="intake_item_44" model="workshop.equipment.intake.item">
+            <field name="sequence">44</field>
+            <field name="name">Vehicle Air Filter Element</field>
+        </record>
+        <record id="intake_item_45" model="workshop.equipment.intake.item">
+            <field name="sequence">45</field>
+            <field name="name">Trailer Air Filter Element</field>
+        </record>
+        <record id="intake_item_46" model="workshop.equipment.intake.item">
+            <field name="sequence">46</field>
+            <field name="name">Fuel Tank</field>
+        </record>
+        <record id="intake_item_47" model="workshop.equipment.intake.item">
+            <field name="sequence">47</field>
+            <field name="name">Vehicle Electrical Components</field>
+        </record>
+        <record id="intake_item_48" model="workshop.equipment.intake.item">
+            <field name="sequence">48</field>
+            <field name="name">Trailer Electrical Components</field>
+        </record>
+        <record id="intake_item_49" model="workshop.equipment.intake.item">
+            <field name="sequence">49</field>
+            <field name="name">Fuel Tank Straps / Supports</field>
+        </record>
+        <record id="intake_item_50" model="workshop.equipment.intake.item">
+            <field name="sequence">50</field>
+            <field name="name">Top Tarpaulin</field>
+        </record>
+        <record id="intake_item_51" model="workshop.equipment.intake.item">
+            <field name="sequence">51</field>
+            <field name="name">Bottom Tarpaulin</field>
+        </record>
+        <record id="intake_item_52" model="workshop.equipment.intake.item">
+            <field name="sequence">52</field>
+            <field name="name">Indicator Light Lens</field>
+        </record>
+        <record id="intake_item_53" model="workshop.equipment.intake.item">
+            <field name="sequence">53</field>
+            <field name="name">Entry Steps</field>
+        </record>
+        <record id="intake_item_54" model="workshop.equipment.intake.item">
+            <field name="sequence">54</field>
+            <field name="name">License Plate Light</field>
+        </record>
+
+    </data>
+</odoo>

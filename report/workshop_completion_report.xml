@@ -1,0 +1,15 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+
+    <record id="action_report_workshop_completion" model="ir.actions.report">
+        <field name="name">Job Completion / Customer Acceptance</field>
+        <field name="model">workshop.job.order</field>
+        <field name="report_type">qweb-pdf</field>
+        <field name="report_name">workshop_management.report_job_completion</field>
+        <field name="report_file">workshop_management.report_job_completion</field>
+        <field name="print_report_name">'Job Completion - %s' % (object.name)</field>
+        <field name="binding_model_id" ref="model_workshop_job_order"/>
+        <field name="binding_type">report</field>
+    </record>
+
+</odoo>

@@ -1,0 +1,53 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <data noupdate="1">
+
+        <!-- Standard Job Order approval: any Workshop Supervisor can approve -->
+        <record id="approval_category_workshop_job_standard" model="approval.category">
+            <field name="name">Workshop Job Order</field>
+            <field name="sequence">5</field>
+            <field name="description">Standard workshop job order approval by supervisor.</field>
+            <field name="has_date">no</field>
+            <field name="has_period">no</field>
+            <field name="has_quantity">no</field>
+            <field name="has_amount">required</field>
+            <field name="has_reference">required</field>
+            <field name="has_partner">required</field>
+            <field name="has_payment_method">no</field>
+            <field name="has_location">no</field>
+            <field name="has_product">no</field>
+            <field name="requirer_document">optional</field>
+            <field name="approval_minimum">1</field>
+            <field name="approver_sequence" eval="False"/>
+            <field name="automated_sequence" eval="False"/>
+        </record>
+
+        <!-- High-value Job Order: Supervisor then Manager (sequential) -->
+        <record id="approval_category_workshop_job_manager" model="approval.category">
+            <field name="name">Workshop Job Order (Manager)</field>
+            <field name="sequence">6</field>
+            <field name="description">High-value job order requiring supervisor then manager approval.</field>
+            <field name="has_date">no</field>
+            <field name="has_period">no</field>
+            <field name="has_quantity">no</field>
+            <field name="has_amount">required</field>
+            <field name="has_reference">required</field>
+            <field name="has_partner">required</field>
+            <field name="has_payment_method">no</field>
+            <field name="has_location">no</field>
+            <field name="has_product">no</field>
+            <field name="requirer_document">optional</field>
+            <field name="approval_minimum">2</field>
+            <field name="approver_sequence" eval="True"/>
+            <field name="automated_sequence" eval="False"/>
+        </record>
+
+        <record id="approval_rule_supervisor_default" model="workshop.approval.rule">
+            <field name="category_id" ref="approval_category_workshop_job_standard"/>
+        </record>
+        <record id="approval_rule_manager_500k" model="workshop.approval.rule">
+            <field name="category_id" ref="approval_category_workshop_job_manager"/>
+        </record>
+
+    </data>
+</odoo>

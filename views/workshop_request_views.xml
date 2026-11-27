@@ -1,0 +1,196 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+
+    <record id="workshop_request_view_list" model="ir.ui.view">
+        <field name="name">workshop.request.list</field>
+        <field name="model">workshop.request</field>
+        <field name="arch" type="xml">
+            <list string="Customer Requests" decoration-muted="state == 'cancelled'">
+                <field name="name"/>
+                <field name="date_request"/>
+                <field name="partner_id"/>
+                <field name="equipment_id"/>
+                <field name="service_location_type" widget="badge"/>
+                <field name="warranty_status" widget="badge"/>
+                <field name="sale_order_id"/>
+                <field name="priority" widget="priority"/>
+                <field name="state" widget="badge"
+                       decoration-info="state == 'draft'"
+                       decoration-primary="state == 'quoted'"
+                       decoration-success="state == 'confirmed'"
+                       decoration-danger="state == 'cancelled'"/>
+            </list>
+        </field>
+    </record>
+
+    <record id="workshop_request_view_search" model="ir.ui.view">
+        <field name="name">workshop.request.search</field>
+        <field name="model">workshop.request</field>
+        <field name="arch" type="xml">
+            <search string="Customer Requests">
+                <field name="name"/>
+                <field name="partner_id"/>
+                <field name="equipment_id"/>
+                <field name="user_id"/>
+                <field name="sale_order_id"/>
+
+                <filter string="Draft" name="filter_draft"
+                        domain="[('state', '=', 'draft')]"/>
+                <filter string="Quoted" name="filter_quoted"
+                        domain="[('state', '=', 'quoted')]"/>
+                <filter string="Confirmed" name="filter_confirmed"
+                        domain="[('state', '=', 'confirmed')]"/>
+                <filter string="Cancelled" name="filter_cancelled"
+                        domain="[('state', '=', 'cancelled')]"/>
+
+                <separator/>
+                <filter string="Low Priority" name="filter_priority_low"
+                        domain="[('priority', '=', '0')]"/>
+                <filter string="Normal Priority" name="filter_priority_normal"
+                        domain="[('priority', '=', '1')]"/>
+                <filter string="High Priority" name="filter_priority_high"
+                        domain="[('priority', '=', '2')]"/>
+                <filter string="Urgent" name="filter_priority_urgent"
+                        domain="[('priority', '=', '3')]"/>
+
+                <separator/>
+                <filter string="In-Shop" name="filter_in_shop"
+                        domain="[('service_location_type', '=', 'in_shop')]"/>
+                <filter string="Field Service" name="filter_field"
+                        domain="[('service_location_type', '=', 'field')]"/>
+
+                <separator/>
+                <filter string="Under Warranty" name="filter_under_warranty"
+                        domain="[('warranty_status', '=', 'under_warranty')]"/>
+                <filter string="Has Quotation" name="filter_has_quotation"
+                        domain="[('sale_order_id', '!=', False)]"/>
+                <filter string="No Quotation" name="filter_no_quotation"
+                        domain="[('sale_order_id', '=', False)]"/>
+                <filter string="My Requests" name="filter_my_requests"
+                        domain="[('user_id', '=', uid)]"/>
+
+                <group>
+                    <filter string="Status" name="group_state"
+                            context="{'group_by': 'state'}"/>
+                    <filter string="Priority" name="group_priority"
+                            context="{'group_by': 'priority'}"/>
+                    <filter string="Customer" name="group_partner"
+                            context="{'group_by': 'partner_id'}"/>
+                    <filter string="Service Location" name="group_location"
+                            context="{'group_by': 'service_location_type'}"/>
+                    <filter string="Responsible" name="group_user"
+                            context="{'group_by': 'user_id'}"/>
+                    <filter string="Request Date" name="group_date"
+                            context="{'group_by': 'date_request:month'}"/>
+                </group>
+            </search>
+        </field>
+    </record>
+
+    <record id="workshop_request_view_form" model="ir.ui.view">
+        <field name="name">workshop.request.form</field>
+        <field name="model">workshop.request</field>
+        <field name="arch" type="xml">
+            <form string="Customer Request">
+                <header>
+                    <button name="action_create_agreement" string="Create Service Agreement" type="object"
+                            class="btn-secondary" invisible="agreement_id != False or state == 'cancelled'"
+                            groups="sales_team.group_sale_salesman,workshop_management.group_workshop_supervisor"/>
+                    <button name="action_create_quotation" string="Create Sale Quotation" type="object"
+                            class="btn-primary" invisible="state != 'draft' or sale_order_id != False"
+                            groups="sales_team.group_sale_salesman,workshop_management.group_workshop_supervisor"/>
+                    <button name="action_cancel" string="Cancel" type="object" class="btn-secondary"
+                            invisible="state == 'cancelled'"/>
+                    <field name="state" widget="statusbar" statusbar_visible="draft,quoted,confirmed"/>
+                </header>
+                <sheet>
+                    <div class="oe_button_box" name="button_box">
+                        <button name="action_view_job_orders" type="object" class="oe_stat_button" icon="fa-cogs"
+                                invisible="job_order_count == 0">
+                            <field name="job_order_count" widget="statinfo" string="Job Orders"/>
+                        </button>
+                    </div>
+                    <div class="oe_title">
+                        <label for="name"/>
+                        <h1>
+                            <field name="name" readonly="1"/>
+                        </h1>
+                    </div>
+                    <group>
+                        <group string="Customer &amp; Equipment/Vehicle">
+                            <field name="partner_id"/>
+                            <field name="partner_tax_id" invisible="not partner_tax_id"/>
+                            <field name="service_location_type" widget="radio"/>
+                            <field name="equipment_id"
+                                   context="{
+                                       'default_partner_id': partner_id,
+                                       'default_company_id': company_id,
+                                   }"
+                                   options="{'no_quick_create': True}"/>
+                            <field name="warranty_status" widget="badge"/>
+                            <field name="agreement_id"/>
+                            <field name="agreement_remaining_visits" invisible="not agreement_id"/>
+                            <field name="agreement_remaining_hours" invisible="not agreement_id"/>
+                        </group>
+                        <group string="Field Service Site" invisible="service_location_type != 'field'">
+                            <field name="service_site_partner_id"
+                                   domain="['|', ('id', '=', partner_id), ('parent_id', '=', partner_id)]"/>
+                            <field name="service_street"/>
+                            <field name="service_city"/>
+                            <field name="service_state_id"/>
+                            <field name="service_country_id"/>
+                            <field name="service_latitude"/>
+                            <field name="service_longitude"/>
+                        </group>
+                        <group string="Details &amp; Quotation">
+                            <field name="date_request"/>
+                            <field name="priority" widget="priority"/>
+                            <field name="sale_order_id" readonly="1"/>
+                            <field name="user_id" widget="many2one_avatar_user"/>
+                            <field name="company_id" groups="base.group_multi_company"/>
+                        </group>
+                    </group>
+                    <notebook>
+                        <page string="Quotation Estimate" name="estimate_lines">
+                            <field name="line_ids">
+                                <list editable="bottom">
+                                    <field name="line_type"/>
+                                    <field name="task_id"/>
+                                    <field name="product_id"/>
+                                    <field name="quantity"/>
+                                    <field name="price_unit"/>
+                                    <field name="is_warranty_covered" readonly="1"/>
+                                    <field name="currency_id" column_invisible="1"/>
+                                    <field name="price_subtotal" widget="monetary"/>
+                                </list>
+                            </field>
+                        </page>
+                        <page string="Customer Complaint" name="complaint">
+                            <field name="complaint" placeholder="Describe the problem reported by the customer..."/>
+                        </page>
+                        <page string="Inspection Findings &amp; Notes" name="inspection">
+                            <field name="inspection_notes" placeholder="Technician initial inspection notes..."/>
+                        </page>
+                        <page string="Inspection Photos / Attachments" name="photos">
+                            <div class="alert alert-info" role="alert" invisible="id">
+                                Save the request first, then upload inspection photos.
+                            </div>
+                            <field name="inspection_photo_ids"
+                                   widget="many2many_binary"
+                                   invisible="not id"
+                                   options="{'accepted_file_extensions': 'image/*,application/pdf'}"/>
+                        </page>
+                    </notebook>
+                </sheet>
+                <chatter/>
+            </form>
+        </field>
+    </record>
+
+    <record id="workshop_request_action" model="ir.actions.act_window">
+        <field name="name">Customer Requests</field>
+        <field name="res_model">workshop.request</field>
+        <field name="view_mode">list,form</field>
+    </record>
+
+</odoo>

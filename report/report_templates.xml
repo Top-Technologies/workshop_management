@@ -1,0 +1,282 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+
+    <!-- Job Order PDF Document -->
+    <template id="report_job_order_document">
+        <t t-call="web.external_layout">
+            <t t-set="doc" t-value="doc.with_context(lang=doc.partner_id.lang)"/>
+            <div class="page">
+                <div class="row">
+                    <div class="col-8">
+                        <h2>Workshop Job Order: <span t-field="doc.name"/></h2>
+                    </div>
+                    <div class="col-4 text-end">
+                        <img t-att-src="'/report/barcode/?barcode_type=%s&amp;value=%s&amp;width=%s&amp;height=%s' % ('QR', doc.name, 120, 120)"
+                             style="width:100px;height:100px;" alt="QR"/>
+                        <div class="small text-muted">Scan to look up <span t-field="doc.name"/></div>
+                    </div>
+                </div>
+                <div class="row mt-4 mb-4">
+                    <div class="col-6">
+                        <strong>Customer:</strong> <span t-field="doc.partner_id.name"/><br/>
+                        <strong>Equipment/Vehicle:</strong> <span t-field="doc.equipment_id.display_name"/><br/>
+                        <strong>Warranty Status:</strong> <span t-field="doc.warranty_status"/><br/>
+                        <strong>Sales Order:</strong> <span t-field="doc.sale_order_id.name"/>
+                    </div>
+                    <div class="col-6">
+                        <strong>Expected Finish Date:</strong> <span t-field="doc.expected_finish_date"/><br/>
+                        <strong>Status:</strong> <span t-field="doc.state"/><br/>
+                        <strong>Approval Status:</strong> <span t-field="doc.approval_state"/><br/>
+                        <strong>Client Class:</strong> <span t-field="doc.workshop_client_class"/><br/>
+                        <t t-if="doc.vehicle_released">
+                            <strong>Vehicle Release:</strong> <span t-field="doc.vehicle_release_mode"/>
+                            on <span t-field="doc.vehicle_release_date"/><br/>
+                        </t>
+                    </div>
+                </div>
+
+                <h3>Work Dispatches Summary</h3>
+                <table class="table table-sm table-bordered">
+                    <thead>
+                        <tr>
+                            <th>WO Ref</th>
+                            <th>Department</th>
+                            <th>Job Description</th>
+                            <th>Technician</th>
+                            <th class="text-end">Catalog Hrs</th>
+                            <th class="text-end">Standard Hrs</th>
+                            <th class="text-end">Actual Hrs</th>
+                            <th>State</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr t-foreach="doc.work_order_ids" t-as="wo">
+                            <td><span t-field="wo.name"/></td>
+                            <td><span t-field="wo.department"/></td>
+                            <td><span t-field="wo.task_id.name"/></td>
+                            <td><span t-field="wo.technician_id.name"/></td>
+                            <td class="text-end"><span t-field="wo.standard_hours"/></td>
+                            <td class="text-end"><span t-field="wo.planned_hours"/></td>
+                            <td class="text-end"><span t-field="wo.actual_hours"/></td>
+                            <td><span t-field="wo.state"/></td>
+                        </tr>
+                    </tbody>
+                </table>
+
+                <h3 class="mt-4">Required Spare Parts</h3>
+                <table class="table table-sm table-bordered">
+                    <thead>
+                        <tr>
+                            <th>Request</th>
+                            <th>Product</th>
+                            <th class="text-end">Qty</th>
+                            <th>State</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <t t-foreach="doc.spare_request_ids" t-as="spr">
+                            <tr t-foreach="spr.line_ids" t-as="line">
+                                <td><span t-field="spr.name"/></td>
+                                <td><span t-field="line.product_id.display_name"/></td>
+                                <td class="text-end"><span t-field="line.qty_requested"/></td>
+                                <td><span t-field="spr.state"/></td>
+                            </tr>
+                        </t>
+                    </tbody>
+                </table>
+
+                <h3 class="mt-4">Costing &amp; Hours Rollup</h3>
+                <div class="row">
+                    <div class="col-6">
+                        <table class="table table-sm">
+                            <tr><td><strong>Standard Hours:</strong></td><td class="text-end"><span t-field="doc.planned_hours"/></td></tr>
+                            <tr><td><strong>Actual Hours:</strong></td><td class="text-end"><span t-field="doc.actual_hours"/></td></tr>
+                        </table>
+                    </div>
+                    <div class="col-6">
+                        <table class="table table-sm">
+                            <tr><td><strong>Labor Cost (Standard Hours):</strong></td><td class="text-end"><span t-field="doc.labor_cost"/></td></tr>
+                            <tr><td><strong>Parts Cost:</strong></td><td class="text-end"><span t-field="doc.parts_cost"/></td></tr>
+                            <tr><td><strong>External Job / Outsourcing:</strong></td><td class="text-end"><span t-field="doc.external_service_cost"/></td></tr>
+                            <tr><td><strong>Other Charges:</strong></td><td class="text-end"><span t-field="doc.other_cost"/></td></tr>
+                            <tr><td><strong>Field Expenses:</strong></td><td class="text-end"><span t-field="doc.expense_cost"/></td></tr>
+                            <tr><td><strong>Quoted:</strong></td><td class="text-end"><span t-field="doc.quoted_amount"/></td></tr>
+                            <tr><td><strong>Total Cost:</strong></td><td class="text-end"><strong><span t-field="doc.total_cost"/></strong></td></tr>
+                            <tr><td><strong>Expected Profit:</strong></td><td class="text-end"><span t-field="doc.expected_profit"/></td></tr>
+                            <tr><td><strong>Invoiced:</strong></td><td class="text-end"><span t-field="doc.invoiced_amount"/></td></tr>
+                            <tr><td><strong>Realized Profit:</strong></td><td class="text-end"><span t-field="doc.job_profitability"/></td></tr>
+                        </table>
+                    </div>
+                </div>
+
+                <h3 class="mt-4">Profit Breakdown</h3>
+                <table class="table table-sm table-bordered">
+                    <thead>
+                        <tr>
+                            <th>Type</th>
+                            <th>Description</th>
+                            <th class="text-end">Std Hrs</th>
+                            <th class="text-end">Quoted</th>
+                            <th class="text-end">Cost</th>
+                            <th class="text-end">Expected</th>
+                            <th class="text-end">Invoiced</th>
+                            <th class="text-end">Realized</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr t-foreach="doc.profit_line_ids" t-as="pline">
+                            <td><span t-field="pline.line_type"/></td>
+                            <td><span t-field="pline.name"/></td>
+                            <td class="text-end"><span t-field="pline.hours"/></td>
+                            <td class="text-end"><span t-field="pline.quoted_amount"/></td>
+                            <td class="text-end"><span t-field="pline.cost_amount"/></td>
+                            <td class="text-end"><span t-field="pline.expected_profit"/></td>
+                            <td class="text-end"><span t-field="pline.invoiced_amount"/></td>
+                            <td class="text-end"><span t-field="pline.realized_profit"/></td>
+                        </tr>
+                    </tbody>
+                </table>
+
+                <div class="row mt-5">
+                    <div class="col-6">
+                        <p><strong>Supervisor Signature:</strong></p>
+                        <div style="border-bottom:1px solid #000;height:40px;width:80%;"/>
+                    </div>
+                    <div class="col-6" t-if="doc.customer_signature">
+                        <p><strong>Customer Acceptance Signature:</strong></p>
+                        <img t-att-src="image_data_uri(doc.customer_signature)" style="max-height: 100px;"/>
+                        <p>Signed by: <span t-field="doc.signed_by"/> on <span t-field="doc.signed_on"/></p>
+                    </div>
+                </div>
+            </div>
+        </t>
+    </template>
+
+    <template id="report_job_order">
+        <t t-call="web.html_container">
+            <t t-foreach="docs" t-as="doc">
+                <t t-call="workshop_management.report_job_order_document" t-lang="doc.partner_id.lang"/>
+            </t>
+        </t>
+    </template>
+
+    <!-- Work Order PDF Document -->
+    <template id="report_work_order_document">
+        <t t-call="web.external_layout">
+            <t t-set="doc" t-value="doc.with_context(lang=doc.partner_id.lang)"/>
+            <div class="page">
+                <h2>Work Dispatch: <span t-field="doc.name"/></h2>
+                <div class="row mt-4 mb-4">
+                    <div class="col-6">
+                        <strong>Job Order:</strong> <span t-field="doc.job_order_id.name"/><br/>
+                        <strong>Department:</strong> <span t-field="doc.department"/><br/>
+                        <strong>Customer:</strong> <span t-field="doc.partner_id.name"/><br/>
+                        <strong>Equipment/Vehicle:</strong> <span t-field="doc.equipment_id.display_name"/>
+                    </div>
+                    <div class="col-6">
+                        <strong>Technician:</strong> <span t-field="doc.technician_id.name"/><br/>
+                        <strong>Catalog Hours:</strong> <span t-field="doc.standard_hours"/><br/>
+                        <strong>Standard Hours:</strong> <span t-field="doc.planned_hours"/><br/>
+                        <strong>Status:</strong> <span t-field="doc.state"/>
+                    </div>
+                </div>
+
+                <h3>Job Description</h3>
+                <p><strong>Job Description:</strong> <span t-field="doc.task_id.name"/></p>
+                <p><strong>Instructions:</strong></p>
+                <div t-field="doc.notes"/>
+
+                <h3 class="mt-4">Completion Checklist</h3>
+                <table class="table table-sm table-bordered">
+                    <thead>
+                        <tr>
+                            <th>Item</th>
+                            <th style="width:80px;">Done</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr>
+                            <td>Work completed per task specification</td>
+                            <td>☐</td>
+                        </tr>
+                        <tr>
+                            <td>Tools and parts accounted for</td>
+                            <td>☐</td>
+                        </tr>
+                        <tr>
+                            <td>Area cleaned / safety checks done</td>
+                            <td>☐</td>
+                        </tr>
+                    </tbody>
+                </table>
+
+                <div class="row mt-5">
+                    <div class="col-6">
+                        <p><strong>Technician Signature:</strong></p>
+                        <div style="border-bottom:1px solid #000;height:40px;width:80%;"/>
+                    </div>
+                    <div class="col-6">
+                        <p><strong>Supervisor Signature:</strong></p>
+                        <div style="border-bottom:1px solid #000;height:40px;width:80%;"/>
+                    </div>
+                </div>
+            </div>
+        </t>
+    </template>
+
+    <template id="report_work_order">
+        <t t-call="web.html_container">
+            <t t-foreach="docs" t-as="doc">
+                <t t-call="workshop_management.report_work_order_document" t-lang="doc.partner_id.lang"/>
+            </t>
+        </t>
+    </template>
+
+    <!-- Job Completion / Customer Acceptance Form -->
+    <template id="report_job_completion_document">
+        <t t-call="web.external_layout">
+            <div class="page">
+                <h2>Job Completion / Customer Acceptance Form</h2>
+                <p>
+                    Job Order <strong><span t-field="doc.name"/></strong> —
+                    Customer <strong><span t-field="doc.partner_id.name"/></strong> —
+                    Equipment/Vehicle <strong><span t-field="doc.equipment_id.display_name"/></strong>
+                </p>
+                <p>
+                    Work completed on <span t-field="doc.date_end"/>.
+                    Warranty: <span t-field="doc.warranty_status"/>.
+                </p>
+                <p t-if="doc.vehicle_released">
+                    Vehicle released on <span t-field="doc.vehicle_release_date"/>
+                    (<span t-field="doc.vehicle_release_mode"/>).
+                    <t t-if="doc.payment_pending">
+                        Payment pending: <span t-field="doc.outstanding_invoice_amount"/>.
+                    </t>
+                </p>
+                <h4>Quality Inspections</h4>
+                <ul>
+                    <li t-foreach="doc.quality_inspection_ids" t-as="qi">
+                        <span t-field="qi.name"/> — <span t-field="qi.state"/>
+                    </li>
+                </ul>
+                <div class="mt-4" t-if="doc.customer_signature">
+                    <p><strong>Customer Signature:</strong></p>
+                    <img t-att-src="image_data_uri(doc.customer_signature)" style="max-height:120px;"/>
+                    <p>Signed by <span t-field="doc.signed_by"/> on <span t-field="doc.signed_on"/></p>
+                </div>
+                <p class="mt-4 small text-muted">
+                    This form is archived on the Job Order and Equipment/Vehicle service history.
+                </p>
+            </div>
+        </t>
+    </template>
+
+    <template id="report_job_completion">
+        <t t-call="web.html_container">
+            <t t-foreach="docs" t-as="doc">
+                <t t-call="workshop_management.report_job_completion_document"/>
+            </t>
+        </t>
+    </template>
+
+</odoo>

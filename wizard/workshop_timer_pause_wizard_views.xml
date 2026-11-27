@@ -1,0 +1,28 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <record id="workshop_timer_pause_wizard_view_form" model="ir.ui.view">
+        <field name="name">workshop.timer.pause.wizard.form</field>
+        <field name="model">workshop.timer.pause.wizard</field>
+        <field name="arch" type="xml">
+            <form string="Pause Timer">
+                <group>
+                    <group>
+                        <field name="work_order_id" readonly="1"/>
+                        <field name="job_order_id" readonly="1"/>
+                        <field name="timer_elapsed_hours" widget="float_time"/>
+                    </group>
+                    <group>
+                        <field name="pause_reason" placeholder="Select why you are pausing..."/>
+                    </group>
+                </group>
+                <group>
+                    <field name="notes" placeholder="Optional details (who you are assisting, which part, etc.)"/>
+                </group>
+                <footer>
+                    <button name="action_confirm" string="Pause Timer" type="object" class="btn-warning"/>
+                    <button string="Discard" special="cancel"/>
+                </footer>
+            </form>
+        </field>
+    </record>
+</odoo>

@@ -1,0 +1,92 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <data noupdate="1">
+
+        <record id="task_engine_overhaul" model="workshop.task.master">
+            <field name="code">TSK-001</field>
+            <field name="name">Engine Overhaul</field>
+            <field name="description">Complete engine disassembly, inspection, and rebuild.</field>
+            <field name="estimated_hours">40.0</field>
+            <field name="department" ref="workshop_department_mechanical"/>
+            <field name="is_warrantable">True</field>
+            <field name="warranty_kind">engine_overhaul</field>
+        </record>
+
+        <record id="task_transmission_repair" model="workshop.task.master">
+            <field name="code">TSK-002</field>
+            <field name="name">Transmission Repair</field>
+            <field name="description">Diagnosis and repair of manual/automatic transmission systems.</field>
+            <field name="estimated_hours">24.0</field>
+            <field name="department" ref="workshop_department_mechanical"/>
+            <field name="is_warrantable">True</field>
+            <field name="warranty_kind">gearbox</field>
+        </record>
+
+        <record id="task_gearbox_overhaul" model="workshop.task.master">
+            <field name="code">TSK-010</field>
+            <field name="name">Gearbox Overhaul</field>
+            <field name="description">Complete gearbox / transmission overhaul and rebuild.</field>
+            <field name="estimated_hours">32.0</field>
+            <field name="department" ref="workshop_department_mechanical"/>
+            <field name="is_warrantable">True</field>
+            <field name="warranty_kind">gearbox</field>
+        </record>
+
+        <record id="task_brake_system" model="workshop.task.master">
+            <field name="code">TSK-003</field>
+            <field name="name">Brake System Service</field>
+            <field name="description">Brake pad replacement, disc machining, and hydraulic line service.</field>
+            <field name="estimated_hours">8.0</field>
+            <field name="department" ref="workshop_department_mechanical"/>
+        </record>
+
+        <record id="task_electrical_diagnostics" model="workshop.task.master">
+            <field name="code">TSK-004</field>
+            <field name="name">Electrical Diagnostics</field>
+            <field name="description">Fault code reading, wiring repair, and electrical system testing.</field>
+            <field name="estimated_hours">6.0</field>
+            <field name="department" ref="workshop_department_electrical"/>
+        </record>
+
+        <record id="task_hydraulic_repair" model="workshop.task.master">
+            <field name="code">TSK-005</field>
+            <field name="name">Hydraulic System Repair</field>
+            <field name="description">Cylinder rebuild, pump repair, and hydraulic line replacement.</field>
+            <field name="estimated_hours">16.0</field>
+            <field name="department" ref="workshop_department_mechanical"/>
+        </record>
+
+        <record id="task_body_frame_repair" model="workshop.task.master">
+            <field name="code">TSK-006</field>
+            <field name="name">Body / Frame Repair</field>
+            <field name="description">Structural welding, frame straightening, and panel replacement.</field>
+            <field name="estimated_hours">20.0</field>
+            <field name="department" ref="workshop_department_body"/>
+        </record>
+
+        <record id="task_painting" model="workshop.task.master">
+            <field name="code">TSK-007</field>
+            <field name="name">Painting</field>
+            <field name="description">Surface preparation, primer, and multi-coat paint application.</field>
+            <field name="estimated_hours">12.0</field>
+            <field name="department" ref="workshop_department_painting"/>
+        </record>
+
+        <record id="task_welding" model="workshop.task.master">
+            <field name="code">TSK-008</field>
+            <field name="name">Welding</field>
+            <field name="description">MIG/TIG/Arc welding for structural and cosmetic repairs.</field>
+            <field name="estimated_hours">8.0</field>
+            <field name="department" ref="workshop_department_body"/>
+        </record>
+
+        <record id="task_general_inspection" model="workshop.task.master">
+            <field name="code">TSK-009</field>
+            <field name="name">General Inspection</field>
+            <field name="description">Multi-point vehicle/equipment inspection and condition report.</field>
+            <field name="estimated_hours">4.0</field>
+            <field name="department" ref="workshop_department_inspection"/>
+        </record>
+
+    </data>
+</odoo>

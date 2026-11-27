@@ -1,0 +1,59 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <data noupdate="1">
+
+        <!-- ================================================================
+             Module Category
+             ================================================================ -->
+        <record id="module_category_workshop" model="ir.module.category">
+            <field name="name">Workshop</field>
+            <field name="description">Workshop Management access rights</field>
+            <field name="sequence">30</field>
+        </record>
+
+        <!-- ================================================================
+             Privilege (Odoo 19)
+             ================================================================ -->
+        <record id="privilege_workshop" model="res.groups.privilege">
+            <field name="name">Workshop</field>
+            <field name="category_id" ref="module_category_workshop"/>
+            <field name="sequence">10</field>
+        </record>
+
+        <!-- ================================================================
+             Security Groups
+             ================================================================ -->
+        <record id="group_workshop_receptionist" model="res.groups">
+            <field name="name">Receptionist</field>
+            <field name="privilege_id" ref="privilege_workshop"/>
+            <field name="comment">Front desk: register equipment, fill vehicle intake checklist, and create Customer Requests. Cannot assign work or issue parts.</field>
+        </record>
+
+        <record id="group_workshop_technician" model="res.groups">
+            <field name="name">Technician</field>
+            <field name="privilege_id" ref="privilege_workshop"/>
+            <field name="comment">Can view and execute own Work Dispatches &amp; log timesheets.</field>
+        </record>
+
+        <record id="group_workshop_supervisor" model="res.groups">
+            <field name="name">Supervisor</field>
+            <field name="privilege_id" ref="privilege_workshop"/>
+            <field name="implied_ids" eval="[(4, ref('group_workshop_technician'))]"/>
+            <field name="comment">Can view all Work Dispatches, assign technicians, and approve first-level Job Orders.</field>
+        </record>
+
+        <record id="group_workshop_manager" model="res.groups">
+            <field name="name">Manager</field>
+            <field name="privilege_id" ref="privilege_workshop"/>
+            <field name="implied_ids" eval="[(4, ref('group_workshop_supervisor'))]"/>
+            <field name="comment">Second-level approval above threshold, full reporting &amp; configuration.</field>
+        </record>
+
+        <record id="group_workshop_store" model="res.groups">
+            <field name="name">Store / Inventory User</field>
+            <field name="privilege_id" ref="privilege_workshop"/>
+            <field name="comment">Spare Parts Request approval &amp; inventory issue.</field>
+        </record>
+
+    </data>
+</odoo>

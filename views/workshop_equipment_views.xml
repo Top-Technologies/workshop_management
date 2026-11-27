@@ -1,0 +1,208 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+
+    <record id="workshop_equipment_view_list" model="ir.ui.view">
+        <field name="name">workshop.equipment.list</field>
+        <field name="model">workshop.equipment</field>
+        <field name="arch" type="xml">
+            <list string="Equipment/Vehicle Master">
+                <field name="name"/>
+                <field name="partner_id"/>
+                <field name="equipment_type"/>
+                <field name="make"/>
+                <field name="model"/>
+                <field name="serial_number"/>
+                <field name="chassis_number"/>
+                <field name="plate_number"/>
+                <field name="arrival_date"/>
+                <field name="workshop_status" widget="badge"
+                       decoration-info="workshop_status == 'in_workshop'"
+                       decoration-success="workshop_status == 'released'"
+                       decoration-muted="workshop_status == 'available'"/>
+                <field name="release_date" optional="hide"/>
+                <field name="work_type"/>
+                <field name="town"/>
+                <field name="warranty_end_date"/>
+                <field name="warranty_status" widget="badge"
+                       decoration-success="warranty_status == 'under_warranty'"
+                       decoration-warning="warranty_status == 'expired'"
+                       decoration-muted="warranty_status == 'none'"/>
+            </list>
+        </field>
+    </record>
+
+    <record id="workshop_equipment_view_form" model="ir.ui.view">
+        <field name="name">workshop.equipment.form</field>
+        <field name="model">workshop.equipment</field>
+        <field name="arch" type="xml">
+            <form string="Equipment/Vehicle Master">
+                <sheet>
+                    <widget name="web_ribbon" title="Archived" bg_color="text-bg-danger" invisible="active"/>
+                    <div class="oe_title">
+                        <label for="name"/>
+                        <h1>
+                            <field name="name" placeholder="e.g. Caterpillar Excavator CAT-320D"/>
+                        </h1>
+                    </div>
+                    <group>
+                        <group string="Owner &amp; Category">
+                            <field name="partner_id"/>
+                            <field name="equipment_type"/>
+                            <field name="make"/>
+                            <field name="model"/>
+                            <field name="active" invisible="1"/>
+                        </group>
+                        <group string="Identification &amp; Warranty">
+                            <field name="serial_number"/>
+                            <field name="chassis_number"/>
+                            <field name="plate_number"/>
+                            <field name="warranty_end_date"/>
+                            <field name="warranty_status" widget="badge"/>
+                        </group>
+                    </group>
+                    <group string="Intake &amp; Inspection">
+                        <group>
+                            <field name="arrival_date"/>
+                            <field name="workshop_status" widget="badge"/>
+                            <field name="release_date" readonly="1" invisible="workshop_status != 'released'"/>
+                            <field name="mileage_on_arrival"/>
+                            <field name="town"/>
+                            <field name="work_type"/>
+                            <field name="intake_work_order_no"/>
+                        </group>
+                        <group>
+                            <field name="phone" widget="phone"/>
+                            <field name="inspected_by_id" widget="many2one_avatar_user"/>
+                        </group>
+                    </group>
+                    <notebook>
+                        <page string="Vehicle Intake Checklist" name="intake_checklist">
+                            <div class="mb-2">
+                                <button name="action_load_intake_checklist" type="object"
+                                        string="Load Checklist" class="btn-secondary"
+                                        icon="fa-list"
+                                        groups="workshop_management.group_workshop_supervisor,workshop_management.group_workshop_receptionist"/>
+                            </div>
+                            <field name="intake_line_ids">
+                                <list editable="bottom">
+                                    <field name="sequence" string="No."/>
+                                    <field name="name"/>
+                                    <field name="quantity"/>
+                                    <field name="condition"/>
+                                    <field name="remarks"/>
+                                    <field name="template_item_id" column_invisible="1"/>
+                                </list>
+                            </field>
+                            <separator string="Terms"/>
+                            <field name="intake_terms" nolabel="1"/>
+                        </page>
+                        <page string="Intake Photos / Documents" name="intake_attachments">
+                            <div class="alert alert-info" role="alert" invisible="id">
+                                Save the equipment first, then upload intake photos and documents.
+                            </div>
+                            <field name="intake_attachment_ids"
+                                   widget="many2many_binary"
+                                   invisible="not id"
+                                   options="{'accepted_file_extensions': 'image/*,application/pdf'}"/>
+                        </page>
+                        <page string="Service History (Job Orders)" name="service_history">
+                            <field name="job_order_ids" readonly="1">
+                                <list>
+                                    <field name="name"/>
+                                    <field name="date_start"/>
+                                    <field name="date_end"/>
+                                    <field name="state" widget="badge"/>
+                                </list>
+                            </field>
+                        </page>
+                        <page string="Service Warranties" name="warranties">
+                            <p class="text-muted">
+                                Only Engine Overhaul and Gearbox jobs issue a warranty.
+                                Length comes from the matching period rule (service, vehicle type, customer, agreement).
+                            </p>
+                            <field name="warranty_ids" readonly="1">
+                                <list>
+                                    <field name="name"/>
+                                    <field name="warranty_kind"/>
+                                    <field name="date_start"/>
+                                    <field name="date_end"/>
+                                    <field name="job_order_id"/>
+                                    <field name="state" widget="badge"/>
+                                </list>
+                            </field>
+                        </page>
+                        <page string="Notes" name="notes">
+                            <field name="notes" placeholder="Internal notes &amp; specifications..."/>
+                        </page>
+                    </notebook>
+                </sheet>
+            </form>
+        </field>
+    </record>
+
+    <record id="workshop_equipment_action" model="ir.actions.act_window">
+        <field name="name">Equipment/Vehicle Master</field>
+        <field name="res_model">workshop.equipment</field>
+        <field name="view_mode">list,form</field>
+    </record>
+
+    <record id="workshop_equipment_intake_item_view_list" model="ir.ui.view">
+        <field name="name">workshop.equipment.intake.item.list</field>
+        <field name="model">workshop.equipment.intake.item</field>
+        <field name="arch" type="xml">
+            <list string="Vehicle Intake Checklist Templates" editable="bottom">
+                <field name="sequence" widget="handle"/>
+                <field name="name"/>
+                <field name="active"/>
+                <field name="company_id" groups="base.group_multi_company"/>
+            </list>
+        </field>
+    </record>
+
+    <record id="workshop_equipment_intake_item_action" model="ir.actions.act_window">
+        <field name="name">Vehicle Intake Checklist Templates</field>
+        <field name="res_model">workshop.equipment.intake.item</field>
+        <field name="view_mode">list</field>
+    </record>
+
+    <record id="workshop_equipment_type_view_list" model="ir.ui.view">
+        <field name="name">workshop.equipment.type.list</field>
+        <field name="model">workshop.equipment.type</field>
+        <field name="arch" type="xml">
+            <list string="Equipment/Vehicle Types" editable="bottom">
+                <field name="sequence" widget="handle"/>
+                <field name="name"/>
+                <field name="is_vehicle"/>
+                <field name="active"/>
+                <field name="company_id" groups="base.group_multi_company"/>
+            </list>
+        </field>
+    </record>
+
+    <record id="workshop_equipment_type_action" model="ir.actions.act_window">
+        <field name="name">Equipment/Vehicle Types</field>
+        <field name="res_model">workshop.equipment.type</field>
+        <field name="view_mode">list</field>
+    </record>
+
+    <record id="workshop_work_type_view_list" model="ir.ui.view">
+        <field name="name">workshop.work.type.list</field>
+        <field name="model">workshop.work.type</field>
+        <field name="arch" type="xml">
+            <list string="Types of Work" editable="bottom">
+                <field name="sequence" widget="handle"/>
+                <field name="name"/>
+                <field name="is_punch"/>
+                <field name="active"/>
+                <field name="company_id" groups="base.group_multi_company"/>
+            </list>
+        </field>
+    </record>
+
+    <record id="workshop_work_type_action" model="ir.actions.act_window">
+        <field name="name">Types of Work</field>
+        <field name="res_model">workshop.work.type</field>
+        <field name="view_mode">list</field>
+    </record>
+
+</odoo>

@@ -1,0 +1,83 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <record id="workshop_customer_type_view_list" model="ir.ui.view">
+        <field name="name">workshop.customer.type.list</field>
+        <field name="model">workshop.customer.type</field>
+        <field name="arch" type="xml">
+            <list editable="bottom" string="Customer Types">
+                <field name="name" string="Customer Type Description"/>
+                <field name="company_id" groups="base.group_multi_company" optional="hide"/>
+                <field name="active" optional="hide"/>
+            </list>
+        </field>
+    </record>
+
+    <record id="workshop_customer_type_view_form" model="ir.ui.view">
+        <field name="name">workshop.customer.type.form</field>
+        <field name="model">workshop.customer.type</field>
+        <field name="arch" type="xml">
+            <form string="Customer Type">
+                <sheet>
+                    <group>
+                        <field name="name" string="Customer Type Description"/>
+                        <field name="company_id" groups="base.group_multi_company"/>
+                        <field name="active"/>
+                    </group>
+                </sheet>
+            </form>
+        </field>
+    </record>
+
+    <record id="workshop_customer_type_action" model="ir.actions.act_window">
+        <field name="name">Customer Types</field>
+        <field name="res_model">workshop.customer.type</field>
+        <field name="view_mode">list,form</field>
+    </record>
+
+    <record id="workshop_labor_rate_rule_view_list" model="ir.ui.view">
+        <field name="name">workshop.labor.rate.rule.list</field>
+        <field name="model">workshop.labor.rate.rule</field>
+        <field name="arch" type="xml">
+            <list editable="bottom" string="Labor Rate Rules">
+                <field name="customer_type_id" string="Customer Type Description"
+                       options="{'no_open': True}"/>
+                <field name="pricelist_item_id" string="Pricelist Rule"
+                       options="{'no_create': True}"/>
+                <field name="labor_rate" string="Labour Rate"/>
+                <field name="applied_on" string="Pricelist Rules/Apply On"/>
+                <field name="company_id" column_invisible="True"/>
+                <field name="currency_id" column_invisible="True"/>
+            </list>
+        </field>
+    </record>
+
+    <record id="workshop_labor_rate_rule_view_form" model="ir.ui.view">
+        <field name="name">workshop.labor.rate.rule.form</field>
+        <field name="model">workshop.labor.rate.rule</field>
+        <field name="arch" type="xml">
+            <form string="Labor Rate Rule">
+                <sheet>
+                    <group>
+                        <group>
+                            <field name="customer_type_id" string="Customer Type Description"/>
+                            <field name="pricelist_item_id" string="Pricelist Rule"
+                                   options="{'no_create': True}"/>
+                            <field name="applied_on" string="Pricelist Rules/Apply On"/>
+                        </group>
+                        <group>
+                            <field name="labor_rate" string="Labour Rate"/>
+                            <field name="company_id" groups="base.group_multi_company"/>
+                            <field name="currency_id" invisible="1"/>
+                        </group>
+                    </group>
+                </sheet>
+            </form>
+        </field>
+    </record>
+
+    <record id="workshop_labor_rate_rule_action" model="ir.actions.act_window">
+        <field name="name">Labor Rate Rules</field>
+        <field name="res_model">workshop.labor.rate.rule</field>
+        <field name="view_mode">list,form</field>
+    </record>
+</odoo>

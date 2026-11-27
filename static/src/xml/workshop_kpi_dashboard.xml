@@ -1,0 +1,227 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<templates xml:space="preserve">
+
+    <t t-name="workshop_management.WorkshopKpiDashboard">
+        <div class="o_workshop_dashboard o_action h-100 d-flex flex-column">
+            <div class="o_control_panel border-bottom px-3 py-2">
+                <div class="o_cp_top d-flex justify-content-between align-items-center gap-2">
+                    <div class="d-flex align-items-center gap-2">
+                        <label class="small text-muted mb-0">KPI month</label>
+                        <input type="month"
+                               class="form-control form-control-sm"
+                               style="width: 10.5rem;"
+                               t-att-value="state.kpiMonth"
+                               t-on-change="onKpiMonthChange"/>
+                    </div>
+                    <div class="o_cp_buttons">
+                        <button class="btn btn-secondary"
+                                t-on-click="loadKpiData"
+                                t-att-disabled="state.loading">
+                            <i class="fa fa-refresh me-1" t-att-class="state.loading ? 'fa-spin' : ''"/>
+                            Refresh
+                        </button>
+                    </div>
+                </div>
+            </div>
+
+            <div class="o_content flex-grow-1 overflow-auto">
+                <div class="o_workshop_dashboard__body">
+                    <div class="d-flex align-items-baseline justify-content-between mb-2">
+                        <div>
+                            <h5 class="mb-0">KPI Framework</h5>
+                            <small class="text-muted">
+                                Job Turnaround → Technician Efficiency → Rework → Revenue per Job Type
+                            </small>
+                        </div>
+                        <small class="text-muted">
+                            <t t-out="state.kpi.date_from"/> – <t t-out="state.kpi.date_to"/>
+                        </small>
+                    </div>
+
+                    <div class="row g-3 mb-3">
+                        <div class="col-6 col-xl-4 col-xxl-2">
+                            <div class="o_kanban_record o_kanban_global_click o_workshop_kpi_card"
+                                 t-on-click="() => this.openKpiTurnaround()">
+                                <div class="text-muted text-uppercase small fw-bold">Job Turnaround</div>
+                                <div class="fs-2 fw-bold lh-1">
+                                    <t t-out="formatHours(state.kpi.turnaround.hours)"/> h
+                                </div>
+                                <div class="small text-muted mt-1">
+                                    Avg close − open ·
+                                    <t t-out="state.kpi.turnaround.job_count"/> jobs
+                                </div>
+                            </div>
+                        </div>
+                        <div class="col-6 col-xl-4 col-xxl-2">
+                            <div t-att-class="ftfrCardClass"
+                                 t-on-click="() => this.openKpiFtfr()">
+                                <div class="text-muted text-uppercase small fw-bold">First Time Fix</div>
+                                <div class="fs-2 fw-bold lh-1">
+                                    <t t-out="state.kpi.ftfr.percent"/>%
+                                </div>
+                                <div class="small text-muted mt-1">
+                                    <t t-out="state.kpi.ftfr.jobs_ok"/> /
+                                    <t t-out="state.kpi.ftfr.jobs_total"/> · target ≥
+                                    <t t-out="state.kpi.ftfr.target"/>%
+                                </div>
+                            </div>
+                        </div>
+                        <div class="col-6 col-xl-4 col-xxl-2">
+                            <div class="o_kanban_record o_kanban_global_click o_workshop_kpi_card"
+                                 t-on-click="() => this.openKpiUtilization()">
+                                <div class="text-muted text-uppercase small fw-bold">Utilization</div>
+                                <div class="fs-2 fw-bold lh-1">
+                                    <t t-out="state.kpi.utilization.percent"/>%
+                                </div>
+                                <div class="small text-muted mt-1">
+                                    <t t-out="formatHours(state.kpi.utilization.productive_hours)"/> /
+                                    <t t-out="formatHours(state.kpi.utilization.available_hours)"/> h
+                                </div>
+                            </div>
+                        </div>
+                        <div class="col-6 col-xl-4 col-xxl-2">
+                            <div t-att-class="reworkCardClass"
+                                 t-on-click="() => this.openKpiReworkJobs()">
+                                <div class="text-muted text-uppercase small fw-bold">Rework Rate</div>
+                                <div class="fs-2 fw-bold lh-1">
+                                    <t t-out="state.kpi.rework.percent"/>%
+                                </div>
+                                <div class="small text-muted mt-1">
+                                    <t t-out="state.kpi.rework.jobs_rework"/> /
+                                    <t t-out="state.kpi.rework.jobs_total"/> · target ≤
+                                    <t t-out="state.kpi.rework.target"/>%
+                                </div>
+                            </div>
+                        </div>
+                        <div class="col-6 col-xl-4 col-xxl-2">
+                            <div class="o_kanban_record o_kanban_global_click o_workshop_kpi_card o_workshop_kpi_card--success"
+                                 t-on-click="() => this.openKpiRevenue()">
+                                <div class="text-muted text-uppercase small fw-bold">Revenue / Job Type</div>
+                                <div class="fs-4 fw-bold lh-1 text-truncate">
+                                    <t t-out="state.kpi.currency"/>
+                                    <t t-out="formatMoney(state.kpi.revenue_per_type.overall_per_job)"/>
+                                </div>
+                                <div class="small text-muted mt-1">
+                                    Invoiced ÷ completed jobs
+                                </div>
+                            </div>
+                        </div>
+                        <div class="col-6 col-xl-4 col-xxl-2">
+                            <div class="o_kanban_record o_kanban_global_click o_workshop_kpi_card"
+                                 t-on-click="() => this.openKpiVehicles()">
+                                <div class="text-muted text-uppercase small fw-bold">Trucks &amp; Punch</div>
+                                <div class="fs-2 fw-bold lh-1">
+                                    <t t-out="state.kpi.volume.vehicles_received"/>
+                                    <span class="fs-6 fw-normal text-muted"> / </span>
+                                    <t t-out="state.kpi.volume.punch_completed"/>
+                                </div>
+                                <div class="small text-muted mt-1">
+                                    Vehicles in / punch jobs done
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div t-if="state.loading" class="text-center py-5 text-muted">
+                        <i class="fa fa-spinner fa-spin fa-2x mb-3"/>
+                        <div>Loading KPI data…</div>
+                    </div>
+
+                    <t t-else="">
+                        <div class="row g-3 mb-3">
+                            <div class="col-lg-6">
+                                <div class="card o_workshop_panel h-100">
+                                    <div class="card-header bg-transparent border-bottom-0 pb-0">
+                                        <h5 class="mb-0">Turnaround by Job Type</h5>
+                                        <small class="text-muted">Average hours (Actual End − Actual Start)</small>
+                                    </div>
+                                    <div class="card-body pt-2">
+                                        <t t-if="state.kpi.turnaround.labels.length">
+                                            <WorkshopChart type="'bar'"
+                                                           labels="state.kpi.turnaround.labels"
+                                                           data="state.kpi.turnaround.by_type"
+                                                           height="240"/>
+                                        </t>
+                                        <div t-else="" class="text-muted small py-4 text-center">
+                                            No completed jobs with start/end dates this month.
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="col-lg-6">
+                                <div class="card o_workshop_panel h-100">
+                                    <div class="card-header bg-transparent border-bottom-0 pb-0">
+                                        <h5 class="mb-0">Revenue per Job Type</h5>
+                                        <small class="text-muted">Invoiced amount ÷ jobs</small>
+                                    </div>
+                                    <div class="card-body pt-2">
+                                        <t t-if="state.kpi.revenue_per_type.labels.length">
+                                            <WorkshopChart type="'bar'"
+                                                           labels="state.kpi.revenue_per_type.labels"
+                                                           data="state.kpi.revenue_per_type.per_job"
+                                                           height="240"/>
+                                        </t>
+                                        <div t-else="" class="text-muted small py-4 text-center">
+                                            No invoiced jobs this month.
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="col-lg-6">
+                                <div class="card o_workshop_panel h-100">
+                                    <div class="card-header bg-transparent border-bottom-0 pb-0 d-flex justify-content-between">
+                                        <div>
+                                            <h5 class="mb-0">Trucks &amp; Punch Volume</h5>
+                                            <small class="text-muted">Last 6 months</small>
+                                        </div>
+                                        <button class="btn btn-link btn-sm px-0" t-on-click="() => this.openKpiPunch()">
+                                            Punch jobs
+                                        </button>
+                                    </div>
+                                    <div class="card-body pt-2">
+                                        <t t-if="state.kpi.volume.trend_labels.length">
+                                            <WorkshopChart type="'bar'"
+                                                           labels="state.kpi.volume.trend_labels"
+                                                           data="state.kpi.volume.vehicles"
+                                                           dataSecondary="state.kpi.volume.punch"
+                                                           labelPrimary="'Vehicles received'"
+                                                           labelSecondary="'Punch completed'"
+                                                           height="240"/>
+                                        </t>
+                                        <div t-else="" class="text-muted small py-4 text-center">
+                                            No intake volume yet.
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="col-lg-6">
+                                <div class="card o_workshop_panel h-100">
+                                    <div class="card-header bg-transparent border-bottom-0 pb-0">
+                                        <h5 class="mb-0">Technician Efficiency</h5>
+                                        <small class="text-muted">Productive vs available hours</small>
+                                    </div>
+                                    <div class="card-body pt-2">
+                                        <t t-if="state.kpi.utilization.labels.length">
+                                            <WorkshopChart type="'bar'"
+                                                           horizontal="true"
+                                                           labels="state.kpi.utilization.labels"
+                                                           data="state.kpi.utilization.productive"
+                                                           dataSecondary="state.kpi.utilization.available"
+                                                           labelPrimary="'Productive'"
+                                                           labelSecondary="'Available'"
+                                                           height="240"/>
+                                        </t>
+                                        <div t-else="" class="text-muted small py-4 text-center">
+                                            No technician hours this month.
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </t>
+                </div>
+            </div>
+        </div>
+    </t>
+
+</templates>

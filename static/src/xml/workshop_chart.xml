@@ -1,0 +1,10 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<templates xml:space="preserve">
+
+    <t t-name="workshop_management.WorkshopChart">
+        <div class="o_workshop_chart" t-att-style="props.height ? 'height:' + props.height + 'px' : 'height:220px'">
+            <canvas t-ref="canvas"/>
+        </div>
+    </t>
+
+</templates>

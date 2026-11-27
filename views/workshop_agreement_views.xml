@@ -1,0 +1,155 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+
+    <record id="workshop_agreement_view_list" model="ir.ui.view">
+        <field name="name">workshop.agreement.list</field>
+        <field name="model">workshop.agreement</field>
+        <field name="arch" type="xml">
+            <list string="Service Agreements" decoration-muted="state in ['expired', 'cancelled']"
+                  decoration-success="state == 'running'">
+                <field name="name"/>
+                <field name="partner_id"/>
+                <field name="date_start"/>
+                <field name="date_end"/>
+                <field name="included_visits"/>
+                <field name="used_visits"/>
+                <field name="remaining_visits"/>
+                <field name="state" widget="badge"
+                       decoration-info="state == 'draft'"
+                       decoration-success="state == 'running'"
+                       decoration-warning="state == 'expired'"
+                       decoration-danger="state == 'cancelled'"/>
+            </list>
+        </field>
+    </record>
+
+    <record id="workshop_agreement_view_search" model="ir.ui.view">
+        <field name="name">workshop.agreement.search</field>
+        <field name="model">workshop.agreement</field>
+        <field name="arch" type="xml">
+            <search string="Service Agreements">
+                <field name="name"/>
+                <field name="partner_id"/>
+                <filter string="Draft" name="filter_draft" domain="[('state', '=', 'draft')]"/>
+                <filter string="Running" name="filter_running" domain="[('state', '=', 'running')]"/>
+                <filter string="Expired" name="filter_expired" domain="[('state', '=', 'expired')]"/>
+                <filter string="Cancelled" name="filter_cancelled" domain="[('state', '=', 'cancelled')]"/>
+                <separator/>
+                <filter string="My Customers" name="filter_my" domain="[('partner_id.user_id', '=', uid)]"/>
+                <group>
+                    <filter string="Status" name="group_state" context="{'group_by': 'state'}"/>
+                    <filter string="Customer" name="group_partner" context="{'group_by': 'partner_id'}"/>
+                    <filter string="Start Date" name="group_start" context="{'group_by': 'date_start:month'}"/>
+                </group>
+            </search>
+        </field>
+    </record>
+
+    <record id="workshop_agreement_view_form" model="ir.ui.view">
+        <field name="name">workshop.agreement.form</field>
+        <field name="model">workshop.agreement</field>
+        <field name="arch" type="xml">
+            <form string="Service Agreement">
+                <header>
+                    <button name="action_confirm" string="Confirm Agreement" type="object"
+                            class="btn-primary" invisible="state != 'draft'"/>
+                    <button name="action_cancel" string="Cancel" type="object"
+                            invisible="state not in ['draft', 'running']"/>
+                    <button name="action_draft" string="Reset to Draft" type="object"
+                            invisible="state not in ['cancelled', 'expired']"/>
+                    <field name="state" widget="statusbar" statusbar_visible="draft,running,expired"/>
+                </header>
+                <sheet>
+                    <div class="oe_button_box" name="button_box">
+                        <button name="action_view_requests" type="object" class="oe_stat_button" icon="fa-inbox">
+                            <field name="request_count" widget="statinfo" string="Requests"/>
+                        </button>
+                        <button name="action_view_job_orders" type="object" class="oe_stat_button" icon="fa-cogs">
+                            <field name="job_order_count" widget="statinfo" string="Job Orders"/>
+                        </button>
+                    </div>
+                    <widget name="web_ribbon" title="Expired" bg_color="text-bg-warning" invisible="state != 'expired'"/>
+                    <div class="oe_title">
+                        <label for="name"/>
+                        <h1>
+                            <field name="name" readonly="1"/>
+                        </h1>
+                    </div>
+                    <group>
+                        <group string="Customer">
+                            <field name="partner_id"/>
+                            <field name="equipment_ids" widget="many2many_tags"
+                                   placeholder="All customer equipment if empty"/>
+                            <field name="sale_order_id"/>
+                        </group>
+                        <group string="Period &amp; Company">
+                            <field name="date_start"/>
+                            <field name="date_end"/>
+                            <field name="company_id" groups="base.group_multi_company"/>
+                            <field name="currency_id" invisible="1"/>
+                            <field name="active" invisible="1"/>
+                        </group>
+                    </group>
+                    <group>
+                        <group string="Visit Allowance">
+                            <field name="included_visits"/>
+                            <field name="visits_unlimited" invisible="1"/>
+                            <field name="used_visits"/>
+                            <field name="remaining_visits" invisible="visits_unlimited"/>
+                        </group>
+                        <group string="Labor Hours">
+                            <field name="included_hours"/>
+                            <field name="hours_unlimited" invisible="1"/>
+                            <field name="used_hours"/>
+                            <field name="remaining_hours" invisible="hours_unlimited"/>
+                            <field name="extra_labor_rate" widget="monetary"/>
+                        </group>
+                    </group>
+                    <notebook>
+                        <page string="Coverage" name="coverage">
+                            <field name="line_ids">
+                                <list editable="bottom">
+                                    <field name="sequence" widget="handle"/>
+                                    <field name="name"/>
+                                    <field name="product_id"/>
+                                    <field name="line_type"/>
+                                    <field name="task_id" optional="hide"/>
+                                    <field name="coverage_type"/>
+                                    <field name="price_unit"/>
+                                </list>
+                            </field>
+                        </page>
+                        <page string="Warranty Periods" name="warranty_periods">
+                            <p class="text-muted">
+                                Optional client-specific durations for Engine Overhaul and Gearbox.
+                                These override the default and vehicle-type rules.
+                            </p>
+                            <field name="warranty_rule_ids">
+                                <list editable="bottom">
+                                    <field name="name"/>
+                                    <field name="warranty_kind"/>
+                                    <field name="duration_months"/>
+                                    <field name="equipment_type_id"/>
+                                    <field name="partner_id" column_invisible="1"/>
+                                    <field name="active"/>
+                                </list>
+                            </field>
+                        </page>
+                        <page string="Terms &amp; Notes" name="notes">
+                            <field name="notes" placeholder="Contract terms, exclusions, SLA notes..."/>
+                        </page>
+                    </notebook>
+                </sheet>
+                <chatter/>
+            </form>
+        </field>
+    </record>
+
+    <record id="workshop_agreement_action" model="ir.actions.act_window">
+        <field name="name">Service Agreements</field>
+        <field name="res_model">workshop.agreement</field>
+        <field name="view_mode">list,form</field>
+        <field name="context">{'search_default_filter_running': 1}</field>
+    </record>
+
+</odoo>

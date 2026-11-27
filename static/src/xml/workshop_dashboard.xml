@@ -1,0 +1,331 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<templates xml:space="preserve">
+
+    <t t-name="workshop_management.WorkshopDashboard">
+        <div class="o_workshop_dashboard o_action h-100 d-flex flex-column">
+            <!-- Control panel -->
+            <div class="o_control_panel border-bottom px-3 py-2">
+                <div class="o_cp_top d-flex justify-content-end">
+                    <div class="o_cp_buttons">
+                        <button class="btn btn-secondary"
+                                t-on-click="loadDashboardData"
+                                t-att-disabled="state.loading">
+                            <i class="fa fa-refresh me-1" t-att-class="state.loading ? 'fa-spin' : ''"/>
+                            Refresh
+                        </button>
+                    </div>
+                </div>
+            </div>
+
+            <div class="o_content flex-grow-1 overflow-auto">
+                <div class="o_workshop_dashboard__body">
+                    <!-- KPI cards -->
+                    <div class="row g-3 mb-3">
+                        <t t-foreach="pipelineKeys" t-as="pipelineKey" t-key="pipelineKey">
+                            <div class="col-6 col-xl-3">
+                                <div class="o_kanban_record o_kanban_global_click o_workshop_kpi_card"
+                                     t-on-click="() => this.openPipeline(state.pipelines[pipelineKey])">
+                                    <div class="d-flex align-items-center gap-3">
+                                        <div class="o_workshop_kpi_card__icon">
+                                            <i class="fa" t-att-class="state.pipelines[pipelineKey].icon"/>
+                                        </div>
+                                        <div class="flex-grow-1 min-w-0">
+                                            <div class="text-muted text-uppercase small fw-bold text-truncate"
+                                                 t-out="state.pipelines[pipelineKey].title"/>
+                                            <div class="fs-2 fw-bold lh-1"
+                                                 t-out="state.totals[pipelineKey]"/>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </t>
+                    </div>
+
+                    <!-- Control KPIs -->
+                    <div class="row g-3 mb-3">
+                        <div class="col-6 col-xl-4 col-xxl-2">
+                            <div class="o_kanban_record o_kanban_global_click o_workshop_kpi_card o_workshop_kpi_card--danger"
+                                 t-on-click="() => this.openOverdue()">
+                                <div class="text-muted text-uppercase small fw-bold">Overdue</div>
+                                <div class="fs-2 fw-bold lh-1" t-out="state.control.overdue"/>
+                                <div class="small text-muted mt-1">Past promised date</div>
+                            </div>
+                        </div>
+                        <div class="col-6 col-xl-4 col-xxl-2">
+                            <div class="o_kanban_record o_kanban_global_click o_workshop_kpi_card o_workshop_kpi_card--warning"
+                                 t-on-click="() => this.openWaitingParts()">
+                                <div class="text-muted text-uppercase small fw-bold">Waiting Parts</div>
+                                <div class="fs-2 fw-bold lh-1" t-out="state.control.waitingParts"/>
+                                <div class="small text-muted mt-1">Jobs blocked on store</div>
+                            </div>
+                        </div>
+                        <div class="col-6 col-xl-4 col-xxl-2">
+                            <div class="o_kanban_record o_kanban_global_click o_workshop_kpi_card"
+                                 t-on-click="() => this.openUtilization()">
+                                <div class="text-muted text-uppercase small fw-bold">Utilization</div>
+                                <div class="fs-2 fw-bold lh-1">
+                                    <t t-out="state.control.utilizationPct"/>%
+                                </div>
+                                <div class="small text-muted mt-1">Actual / standard hours</div>
+                            </div>
+                        </div>
+                        <div class="col-6 col-xl-4 col-xxl-2">
+                            <div class="o_kanban_record o_kanban_global_click o_workshop_kpi_card o_workshop_kpi_card--success"
+                                 t-on-click="() => this.openProfit()">
+                                <div class="text-muted text-uppercase small fw-bold">Profit</div>
+                                <div class="fs-4 fw-bold lh-1 text-truncate"
+                                     t-out="formatMoney(state.control.profit)"/>
+                                <div class="small text-muted mt-1">Invoiced − cost</div>
+                            </div>
+                        </div>
+                        <div class="col-6 col-xl-4 col-xxl-2">
+                            <div class="o_kanban_record o_kanban_global_click o_workshop_kpi_card o_workshop_kpi_card--danger"
+                                 t-on-click="() => this.openQuality()">
+                                <div class="text-muted text-uppercase small fw-bold">QI Fail Rate</div>
+                                <div class="fs-2 fw-bold lh-1">
+                                    <t t-out="state.control.qiFailRate"/>%
+                                </div>
+                                <div class="small text-muted mt-1">
+                                    <t t-out="state.control.qiFail"/> failed /
+                                    <t t-out="state.control.qiPass"/> passed
+                                </div>
+                            </div>
+                        </div>
+                        <div class="col-6 col-xl-4 col-xxl-2">
+                            <div class="o_kanban_record o_kanban_global_click o_workshop_kpi_card o_workshop_kpi_card--warning"
+                                 t-on-click="() => this.openRework()">
+                                <div class="text-muted text-uppercase small fw-bold">Rework Rate</div>
+                                <div class="fs-2 fw-bold lh-1">
+                                    <t t-out="state.control.reworkRate"/>%
+                                </div>
+                                <div class="small text-muted mt-1">
+                                    <t t-out="state.control.reworkOpen"/> open /
+                                    <t t-out="state.control.reworkHistory"/> ever
+                                </div>
+                            </div>
+                        </div>
+                        <div class="col-6 col-xl-4 col-xxl-2">
+                            <div class="o_kanban_record o_kanban_global_click o_workshop_kpi_card o_workshop_kpi_card--warning"
+                                 t-on-click="() => this.openCreditReleases()">
+                                <div class="text-muted text-uppercase small fw-bold">Credit Releases</div>
+                                <div class="fs-2 fw-bold lh-1" t-out="state.control.creditPending"/>
+                                <div class="small text-muted mt-1">Released, payment pending</div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div t-if="state.loading" class="text-center py-5 text-muted">
+                        <i class="fa fa-spinner fa-spin fa-2x mb-3"/>
+                        <div>Loading dashboard data…</div>
+                    </div>
+
+                    <t t-else="">
+                        <!-- Control charts -->
+                        <div class="row g-3 mb-3">
+                            <div class="col-lg-4">
+                                <div class="card o_workshop_panel h-100">
+                                    <div class="card-header bg-transparent border-bottom-0 pb-0">
+                                        <h5 class="mb-0">Parts Aging</h5>
+                                        <small class="text-muted">Jobs waiting on spare parts</small>
+                                    </div>
+                                    <div class="card-body pt-2">
+                                        <WorkshopChart type="'bar'"
+                                                       labels="state.control.partsAging.labels"
+                                                       data="state.control.partsAging.data"
+                                                       colors="state.control.partsAging.colors"
+                                                       height="240"/>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="col-lg-4">
+                                <div class="card o_workshop_panel h-100">
+                                    <div class="card-header bg-transparent border-bottom-0 pb-0 d-flex justify-content-between align-items-start">
+                                        <div>
+                                            <h5 class="mb-0">Technician Hours</h5>
+                                            <small class="text-muted">Actual hours by technician</small>
+                                        </div>
+                                        <button class="btn btn-link btn-sm px-0" t-on-click="() => this.openUtilization()">
+                                            Calendar
+                                        </button>
+                                    </div>
+                                    <div class="card-body pt-2">
+                                        <t t-if="state.control.utilization.labels.length">
+                                            <WorkshopChart type="'bar'"
+                                                           horizontal="true"
+                                                           labels="state.control.utilization.labels"
+                                                           data="state.control.utilization.actual"
+                                                           colors="state.control.utilization.colors"
+                                                           height="240"/>
+                                        </t>
+                                        <div t-else="" class="text-muted small py-4 text-center">
+                                            No technician hours logged yet.
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="col-lg-4">
+                                <div class="card o_workshop_panel h-100">
+                                    <div class="card-header bg-transparent border-bottom-0 pb-0">
+                                        <h5 class="mb-0">Quality &amp; Rework</h5>
+                                        <small class="text-muted">Inspection results</small>
+                                    </div>
+                                    <div class="card-body pt-2">
+                                        <WorkshopChart type="'doughnut'"
+                                                       labels="state.control.quality.labels"
+                                                       data="state.control.quality.data"
+                                                       colors="state.control.quality.colors"
+                                                       height="200"/>
+                                        <div class="small text-muted mt-2">
+                                            Cost of quality:
+                                            <strong t-out="formatMoney(state.control.costOfQuality)"/>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Overview charts -->
+                        <div class="row g-3 mb-3" t-if="overviewTotal > 0">
+                            <div class="col-lg-8">
+                                <div class="card o_workshop_panel h-100">
+                                    <div class="card-header bg-transparent border-bottom-0 pb-0">
+                                        <h5 class="mb-0">Records by Process</h5>
+                                        <small class="text-muted">Total documents across workshop modules</small>
+                                    </div>
+                                    <div class="card-body pt-2">
+                                        <WorkshopChart type="'bar'"
+                                                       labels="state.overview.labels"
+                                                       data="state.overview.data"
+                                                       colors="state.overview.colors"
+                                                       height="300"/>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="col-lg-4">
+                                <div class="card o_workshop_panel h-100">
+                                    <div class="card-header bg-transparent border-bottom-0 pb-0">
+                                        <h5 class="mb-0">Distribution</h5>
+                                        <small class="text-muted">
+                                            <t t-out="overviewTotal"/> total records
+                                        </small>
+                                    </div>
+                                    <div class="card-body pt-2">
+                                        <WorkshopChart type="'doughnut'"
+                                                       labels="state.overview.labels"
+                                                       data="state.overview.data"
+                                                       colors="state.overview.colors"
+                                                       height="300"/>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Pipeline detail panels -->
+                        <div class="row g-3">
+                            <t t-foreach="pipelineKeys" t-as="pipelineKey" t-key="pipelineKey">
+                                <div class="col-12 col-xl-6">
+                                    <div class="card o_workshop_panel h-100">
+                                        <div class="card-header bg-transparent d-flex align-items-center gap-3">
+                                            <div class="o_workshop_panel__icon">
+                                                <i class="fa" t-att-class="state.pipelines[pipelineKey].icon"/>
+                                            </div>
+                                            <div class="flex-grow-1 min-w-0">
+                                                <h5 class="mb-0 text-truncate"
+                                                    t-out="state.pipelines[pipelineKey].title"/>
+                                                <small class="text-muted"
+                                                       t-out="state.pipelines[pipelineKey].subtitle"/>
+                                            </div>
+                                            <span class="badge rounded-pill text-bg-primary fs-6"
+                                                  t-out="state.pipelines[pipelineKey].total"/>
+                                        </div>
+                                        <div class="card-body">
+                                            <t t-if="state.pipelines[pipelineKey].total === 0">
+                                                <div class="o_view_nocontent">
+                                                    <div class="o_nocontent_help">
+                                                        <p class="o_view_nocontent_smiling_face">
+                                                            No records yet
+                                                        </p>
+                                                        <p>Data will appear here once records are created.</p>
+                                                    </div>
+                                                </div>
+                                            </t>
+                                            <t t-else="">
+                                                <div class="row g-3 mb-3">
+                                                    <div class="col-md-5">
+                                                        <div class="o_workshop_chart_box">
+                                                            <div class="small text-muted text-uppercase fw-bold mb-2">
+                                                                By Stage
+                                                            </div>
+                                                            <WorkshopChart type="'pie'"
+                                                                           labels="state.pipelines[pipelineKey].chartLabels"
+                                                                           data="state.pipelines[pipelineKey].chartData"
+                                                                           colors="state.pipelines[pipelineKey].chartColors"
+                                                                           height="220"
+                                                                           onSliceClick="(index) => this.onChartSliceClick(state.pipelines[pipelineKey], index)"/>
+                                                        </div>
+                                                    </div>
+                                                    <div class="col-md-7">
+                                                        <div class="o_workshop_chart_box">
+                                                            <div class="small text-muted text-uppercase fw-bold mb-2">
+                                                                Stage Breakdown
+                                                            </div>
+                                                            <WorkshopChart type="'bar'"
+                                                                           horizontal="true"
+                                                                           labels="state.pipelines[pipelineKey].barLabels"
+                                                                           data="state.pipelines[pipelineKey].barData"
+                                                                           colors="state.pipelines[pipelineKey].barColors"
+                                                                           height="220"
+                                                                           onSliceClick="(index) => this.onBarSliceClick(state.pipelines[pipelineKey], index)"/>
+                                                        </div>
+                                                    </div>
+                                                </div>
+
+                                                <!-- Stage list -->
+                                                <div class="o_workshop_stage_list">
+                                                    <t t-foreach="state.pipelines[pipelineKey].activeStages"
+                                                       t-as="stage"
+                                                       t-key="stage.key">
+                                                        <div class="o_workshop_stage_item"
+                                                             t-on-click="() => this.openStage(state.pipelines[pipelineKey], stage)">
+                                                            <div class="d-flex align-items-center gap-2 mb-1">
+                                                                <span class="o_workshop_stage_dot"
+                                                                      t-att-style="'background:' + stage.color"/>
+                                                                <span class="fw-semibold small flex-grow-1 text-truncate"
+                                                                      t-out="stage.label"/>
+                                                                <span class="badge rounded-pill"
+                                                                      t-att-style="'background:' + stage.color"
+                                                                      t-out="stage.count"/>
+                                                                <span class="text-muted small"
+                                                                      style="min-width: 2.5rem; text-align: right;"
+                                                                      t-out="stage.percent + '%'"/>
+                                                            </div>
+                                                            <div class="progress o_workshop_stage_progress" style="height: 6px;">
+                                                                <div class="progress-bar"
+                                                                     role="progressbar"
+                                                                     t-att-style="'width:' + stage.barWidth + '%; background:' + stage.color"
+                                                                     t-att-aria-valuenow="stage.count"/>
+                                                            </div>
+                                                        </div>
+                                                    </t>
+                                                </div>
+                                            </t>
+                                        </div>
+                                        <div class="card-footer bg-transparent border-top-0 pt-0"
+                                             t-if="state.pipelines[pipelineKey].total > 0">
+                                            <button class="btn btn-link btn-sm px-0"
+                                                    t-on-click="() => this.openPipeline(state.pipelines[pipelineKey])">
+                                                View all <t t-out="state.pipelines[pipelineKey].title"/>
+                                                <i class="fa fa-angle-right ms-1"/>
+                                            </button>
+                                        </div>
+                                    </div>
+                                </div>
+                            </t>
+                        </div>
+                    </t>
+                </div>
+            </div>
+        </div>
+    </t>
+
+</templates>

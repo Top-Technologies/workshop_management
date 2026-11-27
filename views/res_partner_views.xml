@@ -1,0 +1,18 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <record id="view_partner_form_workshop_client_class" model="ir.ui.view">
+        <field name="name">res.partner.form.workshop.client.class</field>
+        <field name="model">res.partner</field>
+        <field name="inherit_id" ref="base.view_partner_form"/>
+        <field name="arch" type="xml">
+            <xpath expr="//sheet" position="inside">
+                <group string="Workshop Customer" name="workshop_release_group"
+                       groups="workshop_management.group_workshop_manager">
+                    <field name="workshop_customer_type_id"
+                           options="{'no_create_edit': False}"/>
+                    <field name="workshop_client_class" widget="radio"/>
+                </group>
+            </xpath>
+        </field>
+    </record>
+</odoo>

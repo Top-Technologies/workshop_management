@@ -1,0 +1,490 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+
+    <record id="workshop_job_order_view_list" model="ir.ui.view">
+        <field name="name">workshop.job.order.list</field>
+        <field name="model">workshop.job.order</field>
+        <field name="arch" type="xml">
+            <list string="Job Orders" decoration-muted="state == 'closed' and vehicle_released"
+                  decoration-warning="payment_pending"
+                  decoration-danger="is_overdue">
+                <field name="name"/>
+                <field name="request_id"/>
+                <field name="partner_id"/>
+                <field name="equipment_id"/>
+                <field name="service_location_type" widget="badge"/>
+                <field name="expected_finish_date"/>
+                <field name="is_overdue" column_invisible="1"/>
+                <field name="approval_state" widget="badge"
+                       decoration-success="approval_state == 'approved'"
+                       decoration-warning="approval_state in ['supervisor_review', 'manager_review']"
+                       decoration-danger="approval_state == 'rejected'"/>
+                <field name="planned_hours"/>
+                <field name="actual_hours"/>
+                <field name="total_cost" widget="monetary"/>
+                <field name="expected_profit" widget="monetary" optional="hide"/>
+                <field name="job_profitability" widget="monetary" optional="hide"/>
+                <field name="vehicle_released" optional="show" widget="boolean"/>
+                <field name="vehicle_release_mode" optional="hide" widget="badge"
+                       decoration-success="vehicle_release_mode == 'paid'"
+                       decoration-warning="vehicle_release_mode == 'credit'"
+                       decoration-muted="vehicle_release_mode == 'no_charge'"/>
+                <field name="payment_pending" optional="hide"/>
+                <field name="outstanding_invoice_amount" widget="monetary" optional="hide"/>
+                <field name="state" widget="badge"
+                       decoration-info="state in ['draft', 'waiting_approval']"
+                       decoration-primary="state in ['approved', 'assigned']"
+                       decoration-warning="state in ['in_progress', 'waiting_parts', 'quality_inspection']"
+                       decoration-success="state in ['completed', 'closed']"/>
+            </list>
+        </field>
+    </record>
+
+    <record id="workshop_job_order_view_search" model="ir.ui.view">
+        <field name="name">workshop.job.order.search</field>
+        <field name="model">workshop.job.order</field>
+        <field name="arch" type="xml">
+            <search string="Job Orders">
+                <field name="name"/>
+                <field name="partner_id"/>
+                <field name="equipment_id"/>
+                <field name="request_id"/>
+                <field name="sale_order_id"/>
+                <field name="user_id"/>
+
+                <filter string="Draft" name="filter_draft"
+                        domain="[('state', '=', 'draft')]"/>
+                <filter string="Waiting Approval" name="filter_waiting_approval"
+                        domain="[('state', '=', 'waiting_approval')]"/>
+                <filter string="Approved" name="filter_approved"
+                        domain="[('state', '=', 'approved')]"/>
+                <filter string="Assigned" name="filter_assigned"
+                        domain="[('state', '=', 'assigned')]"/>
+                <filter string="In Progress" name="filter_in_progress"
+                        domain="[('state', '=', 'in_progress')]"/>
+                <filter string="Waiting Parts" name="filter_waiting_parts"
+                        domain="[('state', '=', 'waiting_parts')]"/>
+                <filter string="Quality Check" name="filter_quality_inspection"
+                        domain="[('state', '=', 'quality_inspection')]"/>
+                <filter string="Completed" name="filter_completed"
+                        domain="[('state', '=', 'completed')]"/>
+                <filter string="Closed" name="filter_closed"
+                        domain="[('state', '=', 'closed')]"/>
+
+                <separator/>
+                <filter string="Vehicle Released" name="filter_vehicle_released"
+                        domain="[('vehicle_released', '=', True)]"/>
+                <filter string="Awaiting Vehicle Release" name="filter_awaiting_release"
+                        domain="[('state', '=', 'closed'), ('vehicle_released', '=', False)]"/>
+                <filter string="Released on Credit / Payment Pending" name="filter_payment_pending"
+                        domain="[('payment_pending', '=', True)]"/>
+                <filter string="Standard / New Clients" name="filter_client_standard"
+                        domain="[('workshop_client_class', '=', 'standard')]"/>
+                <filter string="Credit / Trusted Clients" name="filter_client_credit"
+                        domain="[('workshop_client_class', '=', 'credit')]"/>
+
+                <separator/>
+                <filter string="Open Jobs" name="filter_open"
+                        domain="[('state', 'not in', ['closed', 'completed'])]"/>
+                <filter string="Low Priority" name="filter_priority_low"
+                        domain="[('priority', '=', '0')]"/>
+                <filter string="Normal Priority" name="filter_priority_normal"
+                        domain="[('priority', '=', '1')]"/>
+                <filter string="High Priority" name="filter_priority_high"
+                        domain="[('priority', '=', '2')]"/>
+                <filter string="Urgent" name="filter_priority_urgent"
+                        domain="[('priority', '=', '3')]"/>
+
+                <separator/>
+                <filter string="Supervisor Review" name="filter_approval_supervisor"
+                        domain="[('approval_state', '=', 'supervisor_review')]"/>
+                <filter string="Manager Review" name="filter_approval_manager"
+                        domain="[('approval_state', '=', 'manager_review')]"/>
+                <filter string="Approval Approved" name="filter_approval_approved"
+                        domain="[('approval_state', '=', 'approved')]"/>
+                <filter string="Approval Rejected" name="filter_approval_rejected"
+                        domain="[('approval_state', '=', 'rejected')]"/>
+
+                <separator/>
+                <filter string="In-Shop" name="filter_in_shop"
+                        domain="[('service_location_type', '=', 'in_shop')]"/>
+                <filter string="Field Service" name="filter_field"
+                        domain="[('service_location_type', '=', 'field')]"/>
+                <filter string="Warranty Job" name="filter_warranty"
+                        domain="[('is_warranty_job', '=', True)]"/>
+                <filter string="Agreement Job" name="filter_agreement"
+                        domain="[('is_agreement_job', '=', True)]"/>
+                <filter string="My Job Orders" name="filter_my_jobs"
+                        domain="[('user_id', '=', uid)]"/>
+                <filter string="Overdue" name="filter_overdue"
+                        domain="[('is_overdue', '=', True)]"/>
+                <filter string="Waiting Parts (Aging)" name="filter_waiting_parts_aging"
+                        domain="[('state', '=', 'waiting_parts')]"/>
+
+                <group>
+                    <filter string="Status" name="group_state"
+                            context="{'group_by': 'state'}"/>
+                    <filter string="Priority" name="group_priority"
+                            context="{'group_by': 'priority'}"/>
+                    <filter string="Approval Status" name="group_approval_state"
+                            context="{'group_by': 'approval_state'}"/>
+                    <filter string="Customer" name="group_partner"
+                            context="{'group_by': 'partner_id'}"/>
+                    <filter string="Equipment/Vehicle" name="group_equipment"
+                            context="{'group_by': 'equipment_id'}"/>
+                    <filter string="Service Location" name="group_location"
+                            context="{'group_by': 'service_location_type'}"/>
+                    <filter string="Responsible" name="group_user"
+                            context="{'group_by': 'user_id'}"/>
+                    <filter string="Expected Finish" name="group_expected_finish"
+                            context="{'group_by': 'expected_finish_date:month'}"/>
+                    <filter string="Release Mode" name="group_release_mode"
+                            context="{'group_by': 'vehicle_release_mode'}"/>
+                    <filter string="Client Class" name="group_client_class"
+                            context="{'group_by': 'workshop_client_class'}"/>
+                </group>
+            </search>
+        </field>
+    </record>
+
+    <record id="workshop_job_order_view_form" model="ir.ui.view">
+        <field name="name">workshop.job.order.form</field>
+        <field name="model">workshop.job.order</field>
+        <field name="arch" type="xml">
+            <form string="Job Order">
+                <header>
+                    <button name="action_submit_approval" string="Submit for Approval" type="object"
+                            class="btn-primary" invisible="state != 'draft'"
+                            groups="workshop_management.group_workshop_supervisor"/>
+                    <button name="action_open_assign_wizard" string="Assign Technicians / Create Work Pack" type="object"
+                            class="btn-primary" invisible="state not in ['approved', 'assigned', 'in_progress', 'waiting_parts']"
+                            groups="workshop_management.group_workshop_supervisor"/>
+                    <button name="action_create_field_visit" string="Schedule Field Visit" type="object"
+                            class="btn-secondary" invisible="not is_field_job or state in ['draft', 'waiting_approval', 'closed']"
+                            groups="workshop_management.group_workshop_supervisor"/>
+                    <button name="action_resume_from_parts" string="Resume (Parts Received)" type="object"
+                            class="btn-info" invisible="state != 'waiting_parts'"
+                            groups="workshop_management.group_workshop_supervisor"/>
+                    <button name="action_quality_inspection" string="Move to Quality Check" type="object" class="btn-warning"
+                            invisible="state != 'in_progress'"
+                            groups="workshop_management.group_workshop_supervisor"/>
+                    <button name="action_complete" string="Job Completed" type="object" class="btn-success"
+                            invisible="state != 'quality_inspection'"
+                            groups="workshop_management.group_workshop_supervisor"/>
+                    <button name="action_submit_expense" string="Submit Field Expense" type="object"
+                            class="btn-secondary"
+                            invisible="state in ['draft', 'waiting_approval', 'closed']"/>
+                    <button name="action_create_invoice" string="Create Invoice" type="object" class="btn-primary"
+                            invisible="state not in ['completed', 'closed'] or sale_order_id == False or invoice_count > 0"
+                            groups="workshop_management.group_workshop_manager"/>
+                    <button name="action_close" string="Close Job Order" type="object" class="btn-success"
+                            invisible="state != 'completed'"
+                            groups="workshop_management.group_workshop_supervisor"/>
+                    <button name="action_release_vehicle" string="Release Vehicle" type="object"
+                            class="btn-primary" invisible="state != 'closed' or vehicle_released"
+                            groups="workshop_management.group_workshop_supervisor"
+                            confirm="Confirm vehicle/equipment handover under the financial gate?"/>
+                    <field name="state" widget="statusbar"
+                           statusbar_visible="draft,waiting_approval,approved,assigned,in_progress,waiting_parts,quality_inspection,completed,closed"/>
+                </header>
+                <sheet>
+                    <div class="oe_button_box" name="button_box">
+                        <field name="approval_request_count" invisible="1"/>
+                        <button name="action_view_work_orders" type="object" class="oe_stat_button" icon="fa-tasks"
+                                invisible="work_order_count == 0">
+                            <field name="work_order_count" widget="statinfo" string="Work Dispatches"/>
+                        </button>
+                        <button name="action_view_field_visits" type="object" class="oe_stat_button" icon="fa-map-marker"
+                                invisible="field_visit_count == 0">
+                            <field name="field_visit_count" widget="statinfo" string="Field Visits"/>
+                        </button>
+                        <button name="action_view_spare_requests" type="object" class="oe_stat_button" icon="fa-wrench"
+                                invisible="spare_request_count == 0">
+                            <field name="spare_request_count" widget="statinfo" string="Spare Requests"/>
+                        </button>
+                        <button name="action_view_expenses" type="object" class="oe_stat_button" icon="fa-money"
+                                invisible="expense_count == 0">
+                            <field name="expense_count" widget="statinfo" string="Expenses"/>
+                        </button>
+                        <button name="action_view_quality_inspections" type="object" class="oe_stat_button" icon="fa-check-square-o"
+                                invisible="quality_inspection_count == 0">
+                            <field name="quality_inspection_count" widget="statinfo" string="QI Checks"/>
+                        </button>
+                        <button name="action_view_purchase_orders" type="object" class="oe_stat_button" icon="fa-shopping-cart"
+                                invisible="purchase_order_count == 0">
+                            <field name="purchase_order_count" widget="statinfo" string="Purchases"/>
+                        </button>
+                        <button name="action_view_invoices" type="object" class="oe_stat_button" icon="fa-pencil-square-o"
+                                invisible="invoice_count == 0">
+                            <field name="invoice_count" widget="statinfo" string="Invoices"/>
+                        </button>
+                        <button name="action_view_warranties" type="object" class="oe_stat_button" icon="fa-shield"
+                                invisible="warranty_count == 0">
+                            <field name="warranty_count" widget="statinfo" string="Warranties"/>
+                        </button>
+                        <button name="action_view_approval_request" type="object" class="oe_stat_button" icon="fa-check-circle"
+                                invisible="approval_request_count == 0">
+                            <field name="approval_request_count" widget="statinfo" string="Approval"/>
+                        </button>
+                        <button name="action_open_documents" type="object" class="oe_stat_button" icon="fa-file-text-o"
+                                string="Documents"/>
+                    </div>
+                    <div class="oe_title">
+                        <widget name="web_ribbon" title="Released on Credit" bg_color="text-bg-warning"
+                                invisible="not payment_pending"/>
+                        <widget name="web_ribbon" title="Vehicle Released" bg_color="text-bg-success"
+                                invisible="not vehicle_released or payment_pending"/>
+                        <label for="name"/>
+                        <h1>
+                            <field name="name" readonly="1"/>
+                        </h1>
+                    </div>
+                    <div class="alert alert-danger" role="alert"
+                         invisible="not release_blocked">
+                        <field name="release_block_reason" nolabel="1"/>
+                    </div>
+                    <div class="alert alert-warning" role="alert"
+                         invisible="not payment_pending">
+                        Vehicle released on credit. Outstanding amount:
+                        <field name="outstanding_invoice_amount" widget="monetary" class="oe_inline"/>
+                    </div>
+                    <group>
+                        <group string="Origin &amp; Equipment/Vehicle">
+                            <field name="request_id"/>
+                            <field name="sale_order_id"/>
+                            <field name="partner_id"/>
+                            <field name="workshop_client_class" widget="badge"
+                                   decoration-info="workshop_client_class == 'credit'"
+                                   decoration-muted="workshop_client_class == 'standard'"/>
+                            <field name="equipment_id"/>
+                            <field name="warranty_status" widget="badge"/>
+                            <field name="is_warranty_job"/>
+                            <field name="is_agreement_job"/>
+                            <field name="agreement_id"/>
+                            <field name="service_location_type" widget="radio"/>
+                            <field name="is_field_job" invisible="1"/>
+                        </group>
+                        <group string="Field Service Site" invisible="service_location_type != 'field'">
+                            <field name="service_site_partner_id"
+                                   domain="['|', ('id', '=', partner_id), ('parent_id', '=', partner_id)]"/>
+                            <field name="service_street"/>
+                            <field name="service_city"/>
+                            <field name="service_state_id"/>
+                            <field name="service_country_id"/>
+                            <field name="service_latitude"/>
+                            <field name="service_longitude"/>
+                        </group>
+                        <group string="Planning &amp; Status">
+                            <field name="priority" widget="priority"/>
+                            <field name="approval_state" widget="badge"/>
+                            <field name="approval_request_id" readonly="1"/>
+                            <field name="manager_approval_required"/>
+                            <field name="required_approver_group_id" readonly="1"/>
+                            <field name="estimated_cost" widget="monetary"/>
+                            <field name="expected_finish_date"/>
+                            <field name="is_overdue" invisible="not is_overdue"/>
+                            <field name="waiting_parts_since" invisible="state != 'waiting_parts'"/>
+                            <field name="date_start" readonly="1"/>
+                            <field name="date_end" readonly="1"/>
+                            <field name="user_id" widget="many2one_avatar_user"/>
+                            <field name="company_id" groups="base.group_multi_company"/>
+                            <field name="currency_id" invisible="1"/>
+                            <field name="release_blocked" invisible="1"/>
+                        </group>
+                        <group string="Vehicle Release" invisible="state not in ['completed', 'closed']">
+                            <field name="vehicle_released" readonly="1"/>
+                            <field name="vehicle_release_mode" widget="badge" readonly="1"
+                                   invisible="not vehicle_released"/>
+                            <field name="vehicle_release_date" readonly="1"
+                                   invisible="not vehicle_released"/>
+                            <field name="released_by_id" widget="many2one_avatar_user" readonly="1"
+                                   invisible="not vehicle_released"/>
+                            <field name="invoices_fully_paid" readonly="1"/>
+                            <field name="outstanding_invoice_amount" widget="monetary" readonly="1"/>
+                            <field name="payment_pending" readonly="1" invisible="not payment_pending"/>
+                        </group>
+                    </group>
+                    <notebook>
+                        <page string="Work Dispatches" name="work_orders">
+                            <field name="work_order_ids" readonly="1">
+                                <list>
+                                    <field name="name"/>
+                                    <field name="department"/>
+                                    <field name="task_id"/>
+                                    <field name="technician_id"/>
+                                    <field name="planned_hours"/>
+                                    <field name="actual_hours"/>
+                                    <field name="variance_hours"/>
+                                    <field name="rework_count"/>
+                                    <field name="state" widget="badge"/>
+                                </list>
+                            </field>
+                        </page>
+                        <page string="Spare Requests" name="spare_requests">
+                            <field name="spare_request_ids" readonly="1">
+                                <list>
+                                    <field name="name"/>
+                                    <field name="work_order_id"/>
+                                    <field name="requested_by"/>
+                                    <field name="has_shortage"/>
+                                    <field name="state" widget="badge"/>
+                                </list>
+                            </field>
+                        </page>
+                        <page string="Field Expenses" name="expenses">
+                            <p class="text-muted">
+                                Field staff submit personal-money receipts against this Job Order.
+                                The Foreman (Supervisor) validates them. Approved cost is on the job;
+                                the customer is billed at cost plus the company margin from Workshop Settings.
+                            </p>
+                            <field name="expense_ids">
+                                <list>
+                                    <field name="name"/>
+                                    <field name="date"/>
+                                    <field name="submitted_by_id"/>
+                                    <field name="expense_type"/>
+                                    <field name="description"/>
+                                    <field name="amount"/>
+                                    <field name="billable_amount"/>
+                                    <field name="state" widget="badge"/>
+                                </list>
+                            </field>
+                        </page>
+                        <page string="Quality Inspections" name="quality_inspections">
+                            <field name="quality_inspection_ids" readonly="1">
+                                <list>
+                                    <field name="name"/>
+                                    <field name="inspector_id"/>
+                                    <field name="date_inspection"/>
+                                    <field name="state" widget="badge"/>
+                                </list>
+                            </field>
+                        </page>
+                        <page string="Field Visits" name="field_visits" invisible="not is_field_job">
+                            <field name="field_visit_ids" readonly="1">
+                                <list>
+                                    <field name="name"/>
+                                    <field name="technician_id"/>
+                                    <field name="scheduled_start"/>
+                                    <field name="travel_hours"/>
+                                    <field name="on_site_hours"/>
+                                    <field name="state" widget="badge"/>
+                                </list>
+                            </field>
+                        </page>
+                        <page string="Costing &amp; Profitability" name="costing">
+                            <group>
+                                <group string="Labor &amp; Parts Rollup">
+                                    <field name="planned_hours"/>
+                                    <field name="actual_hours"/>
+                                    <field name="labor_cost" widget="monetary"/>
+                                    <field name="parts_cost" widget="monetary"/>
+                                    <field name="external_service_cost" widget="monetary"/>
+                                    <field name="other_cost" widget="monetary"/>
+                                    <field name="expense_cost" widget="monetary"/>
+                                    <field name="cost_of_quality" widget="monetary"/>
+                                </group>
+                                <group string="Totals &amp; Profitability">
+                                    <field name="quoted_amount" widget="monetary"/>
+                                    <field name="total_cost" widget="monetary" class="oe_subtotal_footer_separator"/>
+                                    <field name="expected_profit" widget="monetary"/>
+                                    <field name="invoiced_amount" widget="monetary"/>
+                                    <field name="job_profitability" widget="monetary"/>
+                                </group>
+                                <group string="Field Service KPIs" invisible="not is_field_job">
+                                    <field name="total_travel_hours"/>
+                                    <field name="total_on_site_hours"/>
+                                    <field name="avg_dispatch_to_arrival_hours"/>
+                                </group>
+                            </group>
+                            <separator string="Per Task / Spare / Labor Line"/>
+                            <field name="profit_line_ids" nolabel="1" readonly="1">
+                                <list create="0" delete="0" edit="0">
+                                    <field name="line_type" widget="badge"/>
+                                    <field name="name"/>
+                                    <field name="task_id" optional="show"/>
+                                    <field name="product_id" optional="show"/>
+                                    <field name="hours" optional="show" sum="Hours"/>
+                                    <field name="hourly_rate" optional="hide"/>
+                                    <field name="quoted_amount" widget="monetary" sum="Quoted"/>
+                                    <field name="cost_amount" widget="monetary" sum="Cost"/>
+                                    <field name="expected_profit" widget="monetary" sum="Expected Profit"/>
+                                    <field name="invoiced_amount" widget="monetary" sum="Invoiced" optional="show"/>
+                                    <field name="realized_profit" widget="monetary" sum="Realized Profit" optional="show"/>
+                                    <field name="currency_id" column_invisible="1"/>
+                                </list>
+                            </field>
+                        </page>
+                        <page string="Customer Acceptance &amp; Signature" name="customer_acceptance">
+                            <group>
+                                <group string="E-Signature Block">
+                                    <field name="signed_by"/>
+                                    <field name="signed_on"/>
+                                    <field name="completion_document_id" readonly="1"/>
+                                </group>
+                                <group string="Signature Pad">
+                                    <field name="customer_signature" widget="signature"/>
+                                </group>
+                            </group>
+                        </page>
+                        <page string="Service Warranties" name="warranties">
+                            <p class="text-muted">
+                                Issued automatically when this job closes an Engine Overhaul or Gearbox
+                                that is not already under an active warranty of that kind.
+                            </p>
+                            <field name="warranty_ids" readonly="1">
+                                <list>
+                                    <field name="name"/>
+                                    <field name="warranty_kind"/>
+                                    <field name="date_start"/>
+                                    <field name="date_end"/>
+                                    <field name="duration_months"/>
+                                    <field name="rule_id"/>
+                                    <field name="state" widget="badge"/>
+                                </list>
+                            </field>
+                        </page>
+                        <page string="Approval History" name="approval_history">
+                            <field name="approval_log_ids" readonly="1">
+                                <list>
+                                    <field name="date"/>
+                                    <field name="user_id"/>
+                                    <field name="action" widget="badge"/>
+                                    <field name="comments"/>
+                                </list>
+                            </field>
+                        </page>
+                        <page string="Notes" name="notes">
+                            <field name="notes" placeholder="General observations, customer feedback, notes..."/>
+                        </page>
+                    </notebook>
+                </sheet>
+                <chatter/>
+            </form>
+        </field>
+    </record>
+
+    <record id="workshop_job_order_action" model="ir.actions.act_window">
+        <field name="name">Job Orders</field>
+        <field name="res_model">workshop.job.order</field>
+        <field name="view_mode">list,form,kanban</field>
+    </record>
+
+    <record id="workshop_job_order_action_payment_pending" model="ir.actions.act_window">
+        <field name="name">Credit Releases (Payment Pending)</field>
+        <field name="res_model">workshop.job.order</field>
+        <field name="view_mode">list,form,kanban</field>
+        <field name="domain">[('payment_pending', '=', True)]</field>
+        <field name="context">{'search_default_filter_payment_pending': 1}</field>
+        <field name="help" type="html">
+            <p class="o_view_nocontent_smiling_face">
+                No vehicles released on credit with unpaid invoices.
+            </p>
+            <p>
+                Corporate / trusted / credit clients can take the vehicle before payment.
+                Those jobs appear here until the invoice is fully paid.
+            </p>
+        </field>
+    </record>
+
+</odoo>

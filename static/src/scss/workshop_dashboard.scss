@@ -1,0 +1,134 @@
+.o_workshop_dashboard {
+    width: 100%;
+    height: 100%;
+    min-height: 100%;
+    background-color: var(--o-view-background-color, #f8f9fa);
+
+    .o_control_panel {
+        background-color: var(--o-view-background-color, #fff);
+        flex-shrink: 0;
+    }
+
+    .o_content {
+        width: 100%;
+        flex: 1 1 auto;
+        min-height: 0;
+    }
+
+    .o_workshop_dashboard__body {
+        width: 100%;
+        max-width: none;
+        padding: 1rem 1.5rem;
+    }
+}
+
+.o_workshop_kpi_card {
+    min-height: 88px;
+    padding: 1rem 1.1rem;
+    border: 1px solid var(--border-color, #dee2e6);
+    border-radius: var(--border-radius, 0.375rem);
+    background: var(--o-view-background-color, #fff);
+    box-shadow: 0 1px 2px rgba(16, 24, 40, 0.04);
+    transition: box-shadow 0.15s ease, border-color 0.15s ease;
+
+    &:hover {
+        border-color: var(--o-brand-primary, #714b67);
+        box-shadow: 0 4px 12px rgba(16, 24, 40, 0.08);
+    }
+
+    &__icon {
+        width: 2.75rem;
+        height: 2.75rem;
+        border-radius: 0.5rem;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        background: rgba(113, 75, 103, 0.1);
+        color: var(--o-brand-primary, #714b67);
+        font-size: 1.1rem;
+        flex-shrink: 0;
+    }
+
+    &--danger {
+        border-left: 3px solid #ef4444;
+    }
+
+    &--warning {
+        border-left: 3px solid #f59e0b;
+    }
+
+    &--success {
+        border-left: 3px solid #22c55e;
+    }
+}
+
+.o_workshop_panel {
+    border: 1px solid var(--border-color, #dee2e6);
+    border-radius: var(--border-radius, 0.375rem);
+    box-shadow: 0 1px 2px rgba(16, 24, 40, 0.04);
+
+    .card-header {
+        padding: 1rem 1.25rem 0.75rem;
+    }
+
+    .card-body {
+        padding: 0.75rem 1.25rem 1.25rem;
+    }
+
+    &__icon {
+        width: 2.25rem;
+        height: 2.25rem;
+        border-radius: 0.375rem;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        background: rgba(113, 75, 103, 0.1);
+        color: var(--o-brand-primary, #714b67);
+        flex-shrink: 0;
+    }
+}
+
+.o_workshop_chart {
+    position: relative;
+    width: 100%;
+
+    canvas {
+        width: 100% !important;
+        height: 100% !important;
+    }
+}
+
+.o_workshop_chart_box {
+    background: var(--o-view-background-color, #fff);
+    border: 1px solid var(--border-color, #e9ecef);
+    border-radius: 0.375rem;
+    padding: 0.75rem;
+    height: 100%;
+}
+
+.o_workshop_stage_list {
+    display: flex;
+    flex-direction: column;
+    gap: 0.65rem;
+}
+
+.o_workshop_stage_item {
+    padding: 0.35rem 0.25rem;
+    border-radius: 0.25rem;
+    cursor: pointer;
+
+    &:hover {
+        background: rgba(0, 0, 0, 0.03);
+    }
+}
+
+.o_workshop_stage_dot {
+    width: 0.5rem;
+    height: 0.5rem;
+    border-radius: 50%;
+    flex-shrink: 0;
+}
+
+.o_workshop_stage_progress {
+    background-color: var(--border-color, #e9ecef);
+}

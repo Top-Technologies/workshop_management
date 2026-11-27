@@ -1,0 +1,349 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+
+    <record id="workshop_work_order_view_list" model="ir.ui.view">
+        <field name="name">workshop.work.order.list</field>
+        <field name="model">workshop.work.order</field>
+        <field name="arch" type="xml">
+            <list string="Work Dispatches" decoration-muted="state == 'verified'"
+                  decoration-danger="state == 'rework' or rework_count > 0">
+                <field name="name"/>
+                <field name="job_order_id"/>
+                <field name="department"/>
+                <field name="task_id"/>
+                <field name="technician_id"/>
+                <field name="planned_hours"/>
+                <field name="actual_hours"/>
+                <field name="variance_hours"/>
+                <field name="timer_pause_reason" optional="hide"/>
+                <field name="rework_count" optional="show"/>
+                <field name="rework_extra_hours" optional="hide"/>
+                <field name="rework_cost" optional="hide" widget="monetary"/>
+                <field name="state" widget="badge"
+                       decoration-info="state == 'draft'"
+                       decoration-primary="state == 'assigned'"
+                       decoration-warning="state == 'in_progress'"
+                       decoration-danger="state == 'rework'"
+                       decoration-success="state in ['done', 'verified']"/>
+            </list>
+        </field>
+    </record>
+
+    <record id="workshop_work_order_view_search" model="ir.ui.view">
+        <field name="name">workshop.work.order.search</field>
+        <field name="model">workshop.work.order</field>
+        <field name="arch" type="xml">
+            <search string="Work Dispatches">
+                <field name="name"/>
+                <field name="job_order_id"/>
+                <field name="technician_id"/>
+                <field name="task_id"/>
+                <field name="partner_id"/>
+
+                <filter string="Draft" name="filter_draft"
+                        domain="[('state', '=', 'draft')]"/>
+                <filter string="Assigned" name="filter_assigned"
+                        domain="[('state', '=', 'assigned')]"/>
+                <filter string="In Progress" name="filter_in_progress"
+                        domain="[('state', '=', 'in_progress')]"/>
+                <filter string="Done" name="filter_done"
+                        domain="[('state', '=', 'done')]"/>
+                <filter string="Rework" name="filter_rework"
+                        domain="[('state', '=', 'rework')]"/>
+                <filter string="Has Rework History" name="filter_rework_history"
+                        domain="[('rework_count', '>', 0)]"/>
+                <filter string="Verified" name="filter_verified"
+                        domain="[('state', '=', 'verified')]"/>
+
+                <separator/>
+                <filter string="Mechanical" name="filter_dept_mechanical"
+                        domain="[('department.code', '=', 'mechanical')]"/>
+                <filter string="Body / Panel" name="filter_dept_body"
+                        domain="[('department.code', '=', 'body')]"/>
+                <filter string="Electrical" name="filter_dept_electrical"
+                        domain="[('department.code', '=', 'electrical')]"/>
+                <filter string="Painting" name="filter_dept_painting"
+                        domain="[('department.code', '=', 'painting')]"/>
+                <filter string="Inspection" name="filter_dept_inspection"
+                        domain="[('department.code', '=', 'inspection')]"/>
+
+                <separator/>
+                <filter string="Open Work Dispatches" name="filter_open"
+                        domain="[('state', 'not in', ['verified'])]"/>
+                <filter string="Timer Running" name="filter_timer_running"
+                        domain="[('timer_start', '!=', False)]"/>
+                <filter string="Timer Paused" name="filter_timer_paused"
+                        domain="[('timer_pause_reason', '!=', False), ('timer_start', '=', False)]"/>
+                <filter string="Over Standard Hours" name="filter_over_planned"
+                        domain="[('variance_hours', '>', 0)]"/>
+                <filter string="My Work Dispatches" name="filter_my_work_orders"
+                        domain="[('user_id', '=', uid)]"/>
+
+                <group>
+                    <filter string="Status" name="group_state"
+                            context="{'group_by': 'state'}"/>
+                    <filter string="Department" name="group_department"
+                            context="{'group_by': 'department'}"/>
+                    <filter string="Technician" name="group_technician"
+                            context="{'group_by': 'technician_id'}"/>
+                    <filter string="Job Order" name="group_job_order"
+                            context="{'group_by': 'job_order_id'}"/>
+                    <filter string="Pause Reason" name="group_pause_reason"
+                            context="{'group_by': 'timer_pause_reason'}"/>
+                    <filter string="Who Pays" name="group_who_pays"
+                            context="{'group_by': 'rework_who_pays'}"/>
+                    <filter string="Calendar Start" name="group_calendar_start"
+                            context="{'group_by': 'calendar_start:day'}"/>
+                </group>
+            </search>
+        </field>
+    </record>
+
+    <record id="workshop_work_order_view_form" model="ir.ui.view">
+        <field name="name">workshop.work.order.form</field>
+        <field name="model">workshop.work.order</field>
+        <field name="arch" type="xml">
+            <form string="Work Dispatch">
+                <header>
+                    <button name="action_assign" string="Assign" type="object" class="btn-primary"
+                            invisible="state != 'draft'"
+                            groups="workshop_management.group_workshop_technician"/>
+                    <button name="action_timer_start" string="Start Timer" type="object" class="btn-primary"
+                            invisible="is_timer_running or is_timer_paused or state not in ['assigned', 'in_progress', 'rework']"
+                            icon="fa-play"
+                            groups="workshop_management.group_workshop_technician"/>
+                    <button name="action_timer_start" string="Resume Timer" type="object" class="btn-primary"
+                            invisible="is_timer_running or not is_timer_paused or state not in ['assigned', 'in_progress', 'rework']"
+                            icon="fa-play"
+                            groups="workshop_management.group_workshop_technician"/>
+                    <button name="action_open_pause_timer_wizard" string="Pause Timer" type="object" class="btn-warning"
+                            invisible="not is_timer_running"
+                            icon="fa-pause"
+                            groups="workshop_management.group_workshop_technician"/>
+                    <button name="action_timer_stop" string="Stop Timer" type="object" class="btn-secondary"
+                            invisible="not is_timer_running"
+                            icon="fa-stop"
+                            groups="workshop_management.group_workshop_technician"/>
+                    <button name="action_done" string="Mark Done" type="object" class="btn-success"
+                            invisible="state not in ['in_progress', 'rework']"
+                            groups="workshop_management.group_workshop_technician"/>
+                    <button name="action_open_rework_wizard" string="Send to Rework" type="object"
+                            invisible="state not in ['done', 'verified']"
+                            groups="workshop_management.group_workshop_supervisor"/>
+                    <button name="action_verify" string="Verify Work Dispatch" type="object" class="btn-success"
+                            invisible="state != 'done'"
+                            groups="workshop_management.group_workshop_supervisor"/>
+                    <field name="state" widget="statusbar" statusbar_visible="draft,assigned,in_progress,done,rework,verified"/>
+                </header>
+                <sheet>
+                    <div class="oe_title">
+                        <label for="name"/>
+                        <h1>
+                            <field name="name" readonly="1"/>
+                        </h1>
+                    </div>
+                    <group>
+                        <group string="Job &amp; Assignment">
+                            <field name="job_order_id"/>
+                            <field name="department"/>
+                            <field name="task_id"/>
+                            <field name="request_line_id" invisible="not request_line_id"/>
+                            <field name="technician_id"/>
+                            <field name="user_id" widget="many2one_avatar_user"/>
+                        </group>
+                        <group string="Hours &amp; Dates">
+                            <field name="standard_hours"/>
+                            <field name="planned_hours"/>
+                            <field name="labor_cost" widget="monetary"/>
+                            <field name="actual_hours"/>
+                            <field name="variance_hours"/>
+                            <field name="is_timer_running" invisible="1"/>
+                            <field name="is_timer_paused" invisible="1"/>
+                            <field name="timer_start" invisible="not is_timer_running"/>
+                            <field name="timer_elapsed_hours" invisible="not is_timer_running"
+                                      widget="float_time"/>
+                            <field name="timer_pause_reason" invisible="not is_timer_paused"/>
+                            <field name="timer_pause_notes" invisible="not is_timer_paused or not timer_pause_notes"/>
+                            <field name="planned_start"/>
+                            <field name="planned_finish"/>
+                            <field name="date_start" readonly="1"/>
+                            <field name="date_end" readonly="1"/>
+                            <field name="company_id" groups="base.group_multi_company"/>
+                            <field name="currency_id" invisible="1"/>
+                        </group>
+                    </group>
+                    <group string="Rework &amp; Cost of Quality" invisible="rework_count == 0 and state != 'rework'">
+                        <group>
+                            <field name="rework_count"/>
+                            <field name="rework_cause"/>
+                            <field name="rework_who_pays"/>
+                            <field name="rework_notes"/>
+                        </group>
+                        <group>
+                            <field name="rework_hours_at_fail" widget="float_time"/>
+                            <field name="rework_extra_hours" widget="float_time"/>
+                            <field name="rework_cost" widget="monetary"/>
+                            <field name="labor_cost" widget="monetary"/>
+                        </group>
+                    </group>
+                    <notebook>
+                        <page string="Photos" name="photos">
+                            <field name="photo_ids" widget="many2many_binary" string="Work Photos"/>
+                        </page>
+                        <page string="Timesheets" name="timesheets">
+                            <field name="timesheet_ids">
+                                <list editable="bottom">
+                                    <field name="date"/>
+                                    <field name="user_id"/>
+                                    <field name="name" string="Description"/>
+                                    <field name="unit_amount" string="Hours Spent"/>
+                                </list>
+                            </field>
+                        </page>
+                        <page string="Spare Requests" name="spare_requests">
+                            <field name="spare_request_ids" readonly="1">
+                                <list>
+                                    <field name="name"/>
+                                    <field name="requested_by"/>
+                                    <field name="state" widget="badge"/>
+                                </list>
+                            </field>
+                        </page>
+                        <page string="Quality Checks" name="quality_checks">
+                            <field name="quality_inspection_ids" readonly="1">
+                                <list>
+                                    <field name="name"/>
+                                    <field name="inspector_id"/>
+                                    <field name="state" widget="badge"/>
+                                </list>
+                            </field>
+                        </page>
+                        <page string="Instructions &amp; Notes" name="notes">
+                            <field name="notes" placeholder="Special technician instructions..."/>
+                        </page>
+                    </notebook>
+                </sheet>
+                <chatter/>
+            </form>
+        </field>
+    </record>
+
+    <record id="workshop_work_order_view_kanban" model="ir.ui.view">
+        <field name="name">workshop.work.order.kanban</field>
+        <field name="model">workshop.work.order</field>
+        <field name="arch" type="xml">
+            <kanban default_group_by="department" class="o_kanban_dashboard o_workshop_kanban">
+                <field name="id"/>
+                <field name="name"/>
+                <field name="job_order_id"/>
+                <field name="partner_id"/>
+                <field name="technician_id"/>
+                <field name="task_id"/>
+                <field name="department"/>
+                <field name="state"/>
+                <field name="planned_hours"/>
+                <field name="actual_hours"/>
+                <field name="rework_count"/>
+                <field name="user_id"/>
+                <field name="timer_start"/>
+                <field name="timer_pause_reason"/>
+                <progressbar field="state"
+                             colors="{&quot;in_progress&quot;: &quot;info&quot;, &quot;rework&quot;: &quot;danger&quot;, &quot;done&quot;: &quot;success&quot;, &quot;verified&quot;: &quot;success&quot;}"/>
+                <templates>
+                    <t t-name="card">
+                        <div class="oe_kanban_card oe_kanban_global_click">
+                            <div class="o_kanban_record_top mb-2 d-flex justify-content-between">
+                                <div class="o_kanban_record_headings">
+                                    <strong class="o_kanban_record_title">
+                                        <field name="name"/>
+                                    </strong>
+                                    <span class="text-muted d-block">
+                                        <field name="job_order_id"/>
+                                    </span>
+                                </div>
+                                <field name="state" widget="badge"
+                                       decoration-primary="state == 'assigned'"
+                                       decoration-warning="state == 'in_progress'"
+                                       decoration-danger="state == 'rework'"
+                                       decoration-success="state in ['done', 'verified']"/>
+                            </div>
+                            <div class="o_kanban_record_body">
+                                <div class="text-secondary small" invisible="not task_id">
+                                    <span class="fa fa-list me-1"/> <field name="task_id"/>
+                                </div>
+                                <div class="mt-1 d-flex justify-content-between small">
+                                    <span>
+                                        <span class="fa fa-clock-o me-1"/>
+                                        <field name="actual_hours"/> / <field name="planned_hours"/> hrs
+                                    </span>
+                                    <span class="text-danger" invisible="rework_count == 0">
+                                        <span class="fa fa-repeat me-1"/> <field name="rework_count"/> rework
+                                    </span>
+                                </div>
+                                <div class="text-warning small mt-1" invisible="not timer_start">
+                                    <span class="fa fa-play-circle me-1"/> Timer running
+                                </div>
+                                <div class="text-muted small mt-1" invisible="not timer_pause_reason">
+                                    <span class="fa fa-pause-circle me-1"/> Paused: <field name="timer_pause_reason"/>
+                                </div>
+                            </div>
+                            <div class="o_kanban_record_bottom mt-2 pt-2 border-top d-flex justify-content-between align-items-center">
+                                <field name="partner_id"/>
+                                <field name="technician_id"/>
+                            </div>
+                        </div>
+                    </t>
+                </templates>
+            </kanban>
+        </field>
+    </record>
+
+    <record id="workshop_work_order_view_calendar" model="ir.ui.view">
+        <field name="name">workshop.work.order.calendar</field>
+        <field name="model">workshop.work.order</field>
+        <field name="arch" type="xml">
+            <calendar string="Technician Workload"
+                      date_start="calendar_start"
+                      date_stop="calendar_stop"
+                      color="technician_id"
+                      mode="week"
+                      quick_create="0"
+                      event_open_popup="1">
+                <field name="name"/>
+                <field name="technician_id"/>
+                <field name="department"/>
+                <field name="job_order_id"/>
+                <field name="state"/>
+                <field name="planned_hours"/>
+            </calendar>
+        </field>
+    </record>
+
+    <record id="workshop_work_order_action" model="ir.actions.act_window">
+        <field name="name">Work Dispatches</field>
+        <field name="res_model">workshop.work.order</field>
+        <field name="view_mode">kanban,calendar,list,form</field>
+        <field name="context">{'search_default_filter_open': 1}</field>
+    </record>
+
+    <record id="workshop_department_view_list" model="ir.ui.view">
+        <field name="name">workshop.department.list</field>
+        <field name="model">workshop.department</field>
+        <field name="arch" type="xml">
+            <list string="Workshop Departments" editable="bottom">
+                <field name="sequence" widget="handle"/>
+                <field name="name"/>
+                <field name="code"/>
+                <field name="active"/>
+                <field name="company_id" groups="base.group_multi_company"/>
+            </list>
+        </field>
+    </record>
+
+    <record id="workshop_department_action" model="ir.actions.act_window">
+        <field name="name">Departments</field>
+        <field name="res_model">workshop.department</field>
+        <field name="view_mode">list</field>
+    </record>
+
+</odoo>

@@ -1,0 +1,206 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <data noupdate="1">
+
+        <!-- Technicians: see WOs assigned to their user OR their employee record -->
+        <record id="rule_work_order_technician" model="ir.rule">
+            <field name="name">Work Order: Technician – Own Only</field>
+            <field name="model_id" ref="model_workshop_work_order"/>
+            <field name="domain_force">['|', ('user_id', '=', user.id), ('technician_id.user_id', '=', user.id)]</field>
+            <field name="groups" eval="[(4, ref('group_workshop_technician'))]"/>
+            <field name="perm_read" eval="True"/>
+            <field name="perm_write" eval="True"/>
+            <field name="perm_create" eval="True"/>
+            <field name="perm_unlink" eval="False"/>
+        </record>
+
+        <!-- Supervisors: see all Work Orders -->
+        <record id="rule_work_order_supervisor" model="ir.rule">
+            <field name="name">Work Order: Supervisor – All</field>
+            <field name="model_id" ref="model_workshop_work_order"/>
+            <field name="domain_force">[(1, '=', 1)]</field>
+            <field name="groups" eval="[(4, ref('group_workshop_supervisor'))]"/>
+            <field name="perm_read" eval="True"/>
+            <field name="perm_write" eval="True"/>
+            <field name="perm_create" eval="True"/>
+            <field name="perm_unlink" eval="True"/>
+        </record>
+
+        <!-- Multi-company rules -->
+        <record id="rule_workshop_request_company" model="ir.rule">
+            <field name="name">Workshop Request: Multi-Company</field>
+            <field name="model_id" ref="model_workshop_request"/>
+            <field name="domain_force">[('company_id', 'in', company_ids)]</field>
+        </record>
+
+        <record id="rule_workshop_job_order_company" model="ir.rule">
+            <field name="name">Job Order: Multi-Company</field>
+            <field name="model_id" ref="model_workshop_job_order"/>
+            <field name="domain_force">[('company_id', 'in', company_ids)]</field>
+        </record>
+
+        <record id="rule_workshop_work_order_company" model="ir.rule">
+            <field name="name">Work Order: Multi-Company</field>
+            <field name="model_id" ref="model_workshop_work_order"/>
+            <field name="domain_force">[('company_id', 'in', company_ids)]</field>
+        </record>
+
+        <record id="rule_workshop_spare_request_company" model="ir.rule">
+            <field name="name">Spare Request: Multi-Company</field>
+            <field name="model_id" ref="model_workshop_spare_request"/>
+            <field name="domain_force">[('company_id', 'in', company_ids)]</field>
+        </record>
+
+        <record id="rule_workshop_quality_inspection_company" model="ir.rule">
+            <field name="name">Quality Inspection: Multi-Company</field>
+            <field name="model_id" ref="model_workshop_quality_inspection"/>
+            <field name="domain_force">[('company_id', 'in', company_ids)]</field>
+        </record>
+
+        <record id="rule_field_visit_technician" model="ir.rule">
+            <field name="name">Field Visit: Technician – Own Only</field>
+            <field name="model_id" ref="model_workshop_field_visit"/>
+            <field name="domain_force">['|', ('user_id', '=', user.id), ('technician_id.user_id', '=', user.id)]</field>
+            <field name="groups" eval="[(4, ref('group_workshop_technician'))]"/>
+            <field name="perm_read" eval="True"/>
+            <field name="perm_write" eval="True"/>
+            <field name="perm_create" eval="True"/>
+            <field name="perm_unlink" eval="False"/>
+        </record>
+
+        <record id="rule_field_visit_supervisor" model="ir.rule">
+            <field name="name">Field Visit: Supervisor – All</field>
+            <field name="model_id" ref="model_workshop_field_visit"/>
+            <field name="domain_force">[(1, '=', 1)]</field>
+            <field name="groups" eval="[(4, ref('group_workshop_supervisor'))]"/>
+            <field name="perm_read" eval="True"/>
+            <field name="perm_write" eval="True"/>
+            <field name="perm_create" eval="True"/>
+            <field name="perm_unlink" eval="True"/>
+        </record>
+
+        <record id="rule_workshop_field_visit_company" model="ir.rule">
+            <field name="name">Field Visit: Multi-Company</field>
+            <field name="model_id" ref="model_workshop_field_visit"/>
+            <field name="domain_force">[('company_id', 'in', company_ids)]</field>
+        </record>
+
+        <!-- Technicians: Job Orders they own or have a Work Order on -->
+        <record id="rule_job_order_technician" model="ir.rule">
+            <field name="name">Job Order: Technician – Assigned Only</field>
+            <field name="model_id" ref="model_workshop_job_order"/>
+            <field name="domain_force">['|', '|',
+                ('user_id', '=', user.id),
+                ('work_order_ids.user_id', '=', user.id),
+                ('work_order_ids.technician_id.user_id', '=', user.id)]</field>
+            <field name="groups" eval="[(4, ref('group_workshop_technician'))]"/>
+            <field name="perm_read" eval="True"/>
+            <field name="perm_write" eval="True"/>
+            <field name="perm_create" eval="True"/>
+            <field name="perm_unlink" eval="False"/>
+        </record>
+
+        <record id="rule_job_order_supervisor" model="ir.rule">
+            <field name="name">Job Order: Supervisor – All</field>
+            <field name="model_id" ref="model_workshop_job_order"/>
+            <field name="domain_force">[(1, '=', 1)]</field>
+            <field name="groups" eval="[(4, ref('group_workshop_supervisor'))]"/>
+            <field name="perm_read" eval="True"/>
+            <field name="perm_write" eval="True"/>
+            <field name="perm_create" eval="True"/>
+            <field name="perm_unlink" eval="True"/>
+        </record>
+
+        <!-- Technicians: Requests they own or that have an assigned Job Order -->
+        <record id="rule_workshop_request_technician" model="ir.rule">
+            <field name="name">Workshop Request: Technician – Assigned Only</field>
+            <field name="model_id" ref="model_workshop_request"/>
+            <field name="domain_force">['|', '|', '|',
+                ('user_id', '=', user.id),
+                ('job_order_ids.user_id', '=', user.id),
+                ('job_order_ids.work_order_ids.user_id', '=', user.id),
+                ('job_order_ids.work_order_ids.technician_id.user_id', '=', user.id)]</field>
+            <field name="groups" eval="[(4, ref('group_workshop_technician'))]"/>
+            <field name="perm_read" eval="True"/>
+            <field name="perm_write" eval="True"/>
+            <field name="perm_create" eval="True"/>
+            <field name="perm_unlink" eval="False"/>
+        </record>
+
+        <record id="rule_workshop_request_supervisor" model="ir.rule">
+            <field name="name">Workshop Request: Supervisor – All</field>
+            <field name="model_id" ref="model_workshop_request"/>
+            <field name="domain_force">[(1, '=', 1)]</field>
+            <field name="groups" eval="[(4, ref('group_workshop_supervisor'))]"/>
+            <field name="perm_read" eval="True"/>
+            <field name="perm_write" eval="True"/>
+            <field name="perm_create" eval="True"/>
+            <field name="perm_unlink" eval="True"/>
+        </record>
+
+        <record id="rule_workshop_agreement_company" model="ir.rule">
+            <field name="name">Service Agreement: Multi-Company</field>
+            <field name="model_id" ref="model_workshop_agreement"/>
+            <field name="domain_force">[('company_id', 'in', company_ids)]</field>
+        </record>
+
+        <record id="rule_workshop_agreement_line_company" model="ir.rule">
+            <field name="name">Service Agreement Line: Multi-Company</field>
+            <field name="model_id" ref="model_workshop_agreement_line"/>
+            <field name="domain_force">[('company_id', 'in', company_ids)]</field>
+        </record>
+
+        <record id="rule_workshop_equipment_intake_item_company" model="ir.rule">
+            <field name="name">Vehicle Intake Template: Multi-Company</field>
+            <field name="model_id" ref="model_workshop_equipment_intake_item"/>
+            <field name="domain_force">['|', ('company_id', '=', False), ('company_id', 'in', company_ids)]</field>
+        </record>
+
+        <record id="rule_workshop_equipment_intake_line_company" model="ir.rule">
+            <field name="name">Vehicle Intake Line: Multi-Company</field>
+            <field name="model_id" ref="model_workshop_equipment_intake_line"/>
+            <field name="domain_force">[('company_id', 'in', company_ids)]</field>
+        </record>
+
+        <record id="rule_workshop_expense_technician" model="ir.rule">
+            <field name="name">Field Expense: Technician – Own</field>
+            <field name="model_id" ref="model_workshop_expense"/>
+            <field name="domain_force">[('submitted_by_id', '=', user.id)]</field>
+            <field name="groups" eval="[(4, ref('group_workshop_technician'))]"/>
+            <field name="perm_read" eval="True"/>
+            <field name="perm_write" eval="True"/>
+            <field name="perm_create" eval="True"/>
+            <field name="perm_unlink" eval="False"/>
+        </record>
+
+        <record id="rule_workshop_expense_supervisor" model="ir.rule">
+            <field name="name">Field Expense: Supervisor – All</field>
+            <field name="model_id" ref="model_workshop_expense"/>
+            <field name="domain_force">[(1, '=', 1)]</field>
+            <field name="groups" eval="[(4, ref('group_workshop_supervisor'))]"/>
+            <field name="perm_read" eval="True"/>
+            <field name="perm_write" eval="True"/>
+            <field name="perm_create" eval="True"/>
+            <field name="perm_unlink" eval="True"/>
+        </record>
+
+        <record id="rule_workshop_expense_company" model="ir.rule">
+            <field name="name">Field Expense: Multi-Company</field>
+            <field name="model_id" ref="model_workshop_expense"/>
+            <field name="domain_force">[('company_id', 'in', company_ids)]</field>
+        </record>
+
+        <record id="rule_workshop_customer_type_company" model="ir.rule">
+            <field name="name">Customer Type: Multi-Company</field>
+            <field name="model_id" ref="model_workshop_customer_type"/>
+            <field name="domain_force">['|', ('company_id', '=', False), ('company_id', 'in', company_ids)]</field>
+        </record>
+
+        <record id="rule_workshop_labor_rate_rule_company" model="ir.rule">
+            <field name="name">Labor Rate Rule: Multi-Company</field>
+            <field name="model_id" ref="model_workshop_labor_rate_rule"/>
+            <field name="domain_force">[('company_id', 'in', company_ids)]</field>
+        </record>
+
+    </data>
+</odoo>

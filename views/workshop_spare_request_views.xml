@@ -1,0 +1,203 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+
+    <record id="workshop_spare_request_view_list" model="ir.ui.view">
+        <field name="name">workshop.spare.request.list</field>
+        <field name="model">workshop.spare.request</field>
+        <field name="arch" type="xml">
+            <list string="Spare Parts Requests" decoration-muted="state == 'rejected'">
+                <field name="name"/>
+                <field name="job_order_id"/>
+                <field name="work_order_id"/>
+                <field name="requested_by"/>
+                <field name="has_shortage"/>
+                <field name="picking_id"/>
+                <field name="purchase_order_id"/>
+                <field name="state" widget="badge"
+                       decoration-info="state == 'draft'"
+                       decoration-primary="state == 'submitted'"
+                       decoration-warning="state in ['store_approved', 'waiting_purchase', 'return_flagged']"
+                       decoration-success="state in ['issued', 'partially_returned']"
+                       decoration-danger="state == 'rejected'"/>
+            </list>
+        </field>
+    </record>
+
+    <record id="workshop_spare_request_view_search" model="ir.ui.view">
+        <field name="name">workshop.spare.request.search</field>
+        <field name="model">workshop.spare.request</field>
+        <field name="arch" type="xml">
+            <search string="Spare Parts Requests">
+                <field name="name"/>
+                <field name="job_order_id"/>
+                <field name="work_order_id"/>
+                <field name="requested_by"/>
+
+                <filter string="Draft" name="filter_draft"
+                        domain="[('state', '=', 'draft')]"/>
+                <filter string="Submitted" name="filter_submitted"
+                        domain="[('state', '=', 'submitted')]"/>
+                <filter string="Waiting Purchase" name="filter_waiting_purchase"
+                        domain="[('state', '=', 'waiting_purchase')]"/>
+                <filter string="Store Approved" name="filter_store_approved"
+                        domain="[('state', '=', 'store_approved')]"/>
+                <filter string="Issued" name="filter_issued"
+                        domain="[('state', '=', 'issued')]"/>
+                <filter string="Return Flagged" name="filter_return_flagged"
+                        domain="[('state', '=', 'return_flagged')]"/>
+                <filter string="Partially Returned" name="filter_partially_returned"
+                        domain="[('state', '=', 'partially_returned')]"/>
+                <filter string="Rejected" name="filter_rejected"
+                        domain="[('state', '=', 'rejected')]"/>
+
+                <separator/>
+                <filter string="Pending Store Action" name="filter_pending_store"
+                        domain="[('state', 'in', ['submitted', 'waiting_purchase', 'return_flagged'])]"/>
+                <filter string="Open Requests" name="filter_open"
+                        domain="[('state', 'not in', ['issued', 'partially_returned', 'rejected'])]"/>
+                <filter string="Has Stock Shortage" name="filter_has_shortage"
+                        domain="[('has_shortage', '=', True)]"/>
+                <filter string="Has Picking" name="filter_has_picking"
+                        domain="[('picking_id', '!=', False)]"/>
+                <filter string="Has Purchase Order" name="filter_has_po"
+                        domain="[('purchase_order_id', '!=', False)]"/>
+                <filter string="My Requests" name="filter_my_requests"
+                        domain="[('requested_by', '=', uid)]"/>
+
+                <group>
+                    <filter string="Status" name="group_state"
+                            context="{'group_by': 'state'}"/>
+                    <filter string="Job Order" name="group_job_order"
+                            context="{'group_by': 'job_order_id'}"/>
+                    <filter string="Work Dispatch" name="group_work_order"
+                            context="{'group_by': 'work_order_id'}"/>
+                    <filter string="Requested By" name="group_requested_by"
+                            context="{'group_by': 'requested_by'}"/>
+                </group>
+            </search>
+        </field>
+    </record>
+
+    <record id="workshop_spare_request_view_form" model="ir.ui.view">
+        <field name="name">workshop.spare.request.form</field>
+        <field name="model">workshop.spare.request</field>
+        <field name="arch" type="xml">
+            <form string="Spare Parts Request">
+                <header>
+                    <button name="action_submit" string="Submit to Store" type="object" class="btn-primary"
+                            invisible="state != 'draft'"/>
+                    <button name="action_store_approve" string="Store Approve / Check Stock" type="object"
+                            class="btn-success" invisible="state != 'submitted'"
+                            groups="workshop_management.group_workshop_store"/>
+                    <button name="action_confirm_after_purchase" string="Confirm After Purchase" type="object"
+                            class="btn-success" invisible="state != 'waiting_purchase'"
+                            groups="workshop_management.group_workshop_store"/>
+                    <button name="action_issue" string="Confirm Issue" type="object" class="btn-success"
+                            invisible="state != 'store_approved'"
+                            groups="workshop_management.group_workshop_store"/>
+                    <button name="action_open_flag_return_wizard" string="Flag Non-Fitting / Defective" type="object"
+                            invisible="state not in ['issued', 'return_flagged', 'partially_returned']"/>
+                    <button name="action_process_flagged_returns" string="Process Flagged Returns" type="object"
+                            class="btn-primary" invisible="state != 'return_flagged'"
+                            groups="workshop_management.group_workshop_store"/>
+                    <button name="action_return_unused" string="Return Unused Parts" type="object"
+                            invisible="state not in ['issued', 'return_flagged', 'partially_returned']"
+                            groups="workshop_management.group_workshop_store"/>
+                    <button name="action_reject" string="Reject" type="object" class="btn-danger"
+                            invisible="state not in ['submitted', 'store_approved', 'waiting_purchase']"
+                            groups="workshop_management.group_workshop_store"/>
+                    <field name="state" widget="statusbar"
+                           statusbar_visible="draft,submitted,waiting_purchase,store_approved,issued,return_flagged,partially_returned"/>
+                </header>
+                <sheet>
+                    <div class="oe_title">
+                        <label for="name"/>
+                        <h1>
+                            <field name="name" readonly="1"/>
+                        </h1>
+                    </div>
+                    <group>
+                        <group string="Origin &amp; Requester">
+                            <field name="job_order_id"/>
+                            <field name="work_order_id"/>
+                            <field name="requested_by"/>
+                            <field name="has_shortage"/>
+                            <field name="origin_request_id" readonly="1"
+                                   invisible="origin_request_id == False"/>
+                        </group>
+                        <group string="Inventory &amp; Purchase">
+                            <field name="picking_id" readonly="1"/>
+                            <field name="return_picking_id" readonly="1"/>
+                            <field name="purchase_order_id" readonly="1"/>
+                            <field name="company_id" groups="base.group_multi_company"/>
+                        </group>
+                    </group>
+                    <notebook>
+                        <page string="Spare Parts Lines" name="lines">
+                            <field name="line_ids">
+                                <list editable="bottom">
+                                    <field name="product_id"/>
+                                    <field name="qty_requested"/>
+                                    <field name="qty_available"/>
+                                    <field name="qty_issued"/>
+                                    <field name="qty_flagged" optional="hide"/>
+                                    <field name="qty_returned"/>
+                                    <field name="qty_remaining" optional="show"/>
+                                    <field name="product_uom_id"/>
+                                    <field name="unit_price"/>
+                                    <field name="unit_cost"/>
+                                    <field name="currency_id" column_invisible="1"/>
+                                    <field name="total_price" widget="monetary"/>
+                                    <field name="cost_subtotal" widget="monetary"/>
+                                </list>
+                            </field>
+                        </page>
+                        <page string="Reverse Logistics" name="returns">
+                            <p class="text-muted">
+                                Technicians flag unused, non-fitting, or defective issued parts.
+                                Store inspects each line, chooses restock / scrap / vendor return, then processes.
+                            </p>
+                            <field name="return_ids">
+                                <list editable="bottom" create="false">
+                                    <field name="product_id"/>
+                                    <field name="qty" readonly="state != 'flagged'"/>
+                                    <field name="reason" readonly="state != 'flagged'"/>
+                                    <field name="disposition" readonly="state != 'flagged'"/>
+                                    <field name="request_replacement" readonly="state != 'flagged'"/>
+                                    <field name="notes" readonly="state != 'flagged'"/>
+                                    <field name="flagged_by_id"/>
+                                    <field name="state" widget="badge"/>
+                                    <field name="picking_id" optional="hide"/>
+                                    <field name="replacement_request_id" optional="hide"/>
+                                    <button name="action_cancel" type="object" string="Cancel"
+                                            icon="fa-times"
+                                            invisible="state != 'flagged'"
+                                            groups="workshop_management.group_workshop_store"/>
+                                </list>
+                            </field>
+                            <field name="replacement_request_ids" readonly="1"
+                                   invisible="not replacement_request_ids">
+                                <list>
+                                    <field name="name"/>
+                                    <field name="state" widget="badge"/>
+                                    <field name="requested_by"/>
+                                </list>
+                            </field>
+                        </page>
+                        <page string="Notes" name="notes">
+                            <field name="notes" placeholder="Reason for request, part urgency, etc..."/>
+                        </page>
+                    </notebook>
+                </sheet>
+                <chatter/>
+            </form>
+        </field>
+    </record>
+
+    <record id="workshop_spare_request_action" model="ir.actions.act_window">
+        <field name="name">Spare Parts Requests</field>
+        <field name="res_model">workshop.spare.request</field>
+        <field name="view_mode">list,form</field>
+    </record>
+
+</odoo>

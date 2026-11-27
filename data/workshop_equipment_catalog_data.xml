@@ -1,0 +1,58 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <data noupdate="1">
+
+        <record id="equipment_type_vehicle" model="workshop.equipment.type">
+            <field name="sequence">10</field>
+            <field name="name">Vehicle</field>
+            <field name="is_vehicle">True</field>
+        </record>
+        <record id="equipment_type_machinery" model="workshop.equipment.type">
+            <field name="sequence">20</field>
+            <field name="name">Machinery</field>
+        </record>
+        <record id="equipment_type_generator" model="workshop.equipment.type">
+            <field name="sequence">30</field>
+            <field name="name">Generator</field>
+        </record>
+        <record id="equipment_type_pump" model="workshop.equipment.type">
+            <field name="sequence">40</field>
+            <field name="name">Pump</field>
+        </record>
+        <record id="equipment_type_compressor" model="workshop.equipment.type">
+            <field name="sequence">50</field>
+            <field name="name">Compressor</field>
+        </record>
+        <record id="equipment_type_other" model="workshop.equipment.type">
+            <field name="sequence">90</field>
+            <field name="name">Other</field>
+        </record>
+
+        <record id="work_type_repair" model="workshop.work.type">
+            <field name="sequence">10</field>
+            <field name="name">Repair</field>
+        </record>
+        <record id="work_type_maintenance" model="workshop.work.type">
+            <field name="sequence">20</field>
+            <field name="name">Preventive Maintenance</field>
+        </record>
+        <record id="work_type_inspection" model="workshop.work.type">
+            <field name="sequence">30</field>
+            <field name="name">Inspection</field>
+        </record>
+        <record id="work_type_overhaul" model="workshop.work.type">
+            <field name="sequence">40</field>
+            <field name="name">Overhaul</field>
+            <field name="is_punch">True</field>
+        </record>
+        <record id="work_type_diagnosis" model="workshop.work.type">
+            <field name="sequence">50</field>
+            <field name="name">Diagnosis</field>
+        </record>
+        <record id="work_type_other" model="workshop.work.type">
+            <field name="sequence">90</field>
+            <field name="name">Other</field>
+        </record>
+
+    </data>
+</odoo>

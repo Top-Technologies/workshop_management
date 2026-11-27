@@ -1,0 +1,77 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+
+    <!-- Prefer Documents settings page when available -->
+    <record id="res_config_settings_view_form_workshop_documents" model="ir.ui.view">
+        <field name="name">res.config.settings.view.form.inherit.workshop.documents</field>
+        <field name="model">res.config.settings</field>
+        <field name="inherit_id" ref="base.res_config_settings_view_form"/>
+        <field name="arch" type="xml">
+            <xpath expr="//form" position="inside">
+                <app string="Workshop" name="workshop_management"
+                     groups="workshop_management.group_workshop_manager">
+                    <block title="Workshop Costing" name="workshop_costing_block">
+                        <setting string="Fallback Labor Rate"
+                                 help="Used when no customer-type / pricelist rule matches and the technician has no Workshop Hourly Cost.">
+                            <field name="workshop_default_labor_rate"/>
+                        </setting>
+                    </block>
+                    <block title="Vehicle Release Financial Gate" name="workshop_financial_gate_block">
+                        <setting string="Two-way payment gate"
+                                 help="When enabled: (1) Corporate / trusted / credit clients may take the vehicle before payment; outstanding invoices are tracked as payment-pending. (2) New / standard clients cannot take the vehicle until every customer invoice is fully marked as paid. Set the client class on the customer form.">
+                            <field name="workshop_financial_gate"/>
+                            <div class="text-muted mt-2">
+                                Dual rule: credit/trusted clients — release on credit with AR tracking.
+                                Standard/new clients — block release until the invoice is fully paid.
+                                Classify each customer as Standard / New or Corporate / Trusted / Credit.
+                            </div>
+                        </setting>
+                    </block>
+                    <block title="Field Expense Billing" name="workshop_expense_block">
+                        <setting string="Company profit margin on field expenses"
+                                 help="Applied when the Foreman approves a technician's personal-money expense. Billing = cost ÷ (1 − margin). Example: 20% margin bills 125 for a 100 expense.">
+                            <field name="workshop_expense_margin_percent"/>
+                        </setting>
+                        <setting string="Expense recovery product"
+                                 help="Sales product used to bill approved field expenses on the Job Order's quotation.">
+                            <field name="workshop_expense_product_id"/>
+                        </setting>
+                    </block>
+                    <block title="Documents Integration" name="workshop_documents_block">
+                        <setting string="Archive Workshop files in Documents"
+                                 help="Job completion PDFs, equipment history, and inspection photos are filed into Documents folders automatically.">
+                            <field name="documents_workshop_settings"/>
+                            <div class="content-group" invisible="not documents_workshop_settings">
+                                <div class="row mt16">
+                                    <label for="documents_workshop_folder_id" class="col-lg-4 o_light_label"/>
+                                    <field name="documents_workshop_folder_id"/>
+                                </div>
+                                <div class="row">
+                                    <label for="documents_workshop_completion_folder_id" class="col-lg-4 o_light_label"/>
+                                    <field name="documents_workshop_completion_folder_id"/>
+                                </div>
+                                <div class="row">
+                                    <label for="documents_workshop_equipment_folder_id" class="col-lg-4 o_light_label"/>
+                                    <field name="documents_workshop_equipment_folder_id"/>
+                                </div>
+                                <div class="row">
+                                    <label for="documents_workshop_inspection_folder_id" class="col-lg-4 o_light_label"/>
+                                    <field name="documents_workshop_inspection_folder_id"/>
+                                </div>
+                            </div>
+                        </setting>
+                    </block>
+                </app>
+            </xpath>
+        </field>
+    </record>
+
+    <record id="action_workshop_config_settings" model="ir.actions.act_window">
+        <field name="name">Workshop Settings</field>
+        <field name="res_model">res.config.settings</field>
+        <field name="view_mode">form</field>
+        <field name="target">current</field>
+        <field name="context">{'module': 'workshop_management'}</field>
+    </record>
+
+</odoo>

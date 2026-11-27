@@ -1,0 +1,222 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+
+    <!-- Root Menu: any Workshop role (Technician chain or Store) -->
+    <menuitem id="menu_workshop_root"
+              name="Workshop"
+              sequence="25"
+              web_icon="workshop_management,static/description/icon.png"
+              groups="workshop_management.group_workshop_technician,workshop_management.group_workshop_store,workshop_management.group_workshop_receptionist"/>
+
+    <!-- Top Dashboard (First Landing Item on App Launch) — operations roles only -->
+    <menuitem id="menu_workshop_dashboard_top"
+              name="Dashboard"
+              parent="menu_workshop_root"
+              action="workshop_dashboard_client_action"
+              sequence="1"
+              groups="workshop_management.group_workshop_technician"/>
+
+    <menuitem id="menu_workshop_kpi_dashboard"
+              name="KPI Dashboard"
+              parent="menu_workshop_root"
+              action="workshop_kpi_dashboard_client_action"
+              sequence="2"
+              groups="workshop_management.group_workshop_technician"/>
+
+    <!-- Operations Category -->
+    <menuitem id="menu_workshop_operations"
+              name="Operations"
+              parent="menu_workshop_root"
+              sequence="10"
+              groups="workshop_management.group_workshop_technician,workshop_management.group_workshop_store,workshop_management.group_workshop_receptionist"/>
+
+    <menuitem id="menu_workshop_request"
+              name="Customer Requests"
+              parent="menu_workshop_operations"
+              action="workshop_request_action"
+              sequence="10"
+              groups="workshop_management.group_workshop_technician,workshop_management.group_workshop_receptionist"/>
+
+    <menuitem id="menu_workshop_job_order"
+              name="Job Orders"
+              parent="menu_workshop_operations"
+              action="workshop_job_order_action"
+              sequence="20"
+              groups="workshop_management.group_workshop_technician,workshop_management.group_workshop_receptionist"/>
+
+    <menuitem id="menu_workshop_work_order"
+              name="Work Dispatches"
+              parent="menu_workshop_operations"
+              action="workshop_work_order_action"
+              sequence="30"
+              groups="workshop_management.group_workshop_technician,workshop_management.group_workshop_receptionist"/>
+
+    <menuitem id="menu_workshop_field_visit"
+              name="Field Visits"
+              parent="menu_workshop_operations"
+              action="workshop_field_visit_action"
+              sequence="35"
+              groups="workshop_management.group_workshop_technician"/>
+
+    <menuitem id="menu_workshop_spare_request"
+              name="Spare Parts Requests"
+              parent="menu_workshop_operations"
+              action="workshop_spare_request_action"
+              sequence="40"
+              groups="workshop_management.group_workshop_technician,workshop_management.group_workshop_store"/>
+
+    <menuitem id="menu_workshop_expense"
+              name="Field Expenses"
+              parent="menu_workshop_operations"
+              action="workshop_expense_action"
+              sequence="42"
+              groups="workshop_management.group_workshop_technician"/>
+
+    <menuitem id="menu_workshop_expense_pending"
+              name="Expenses Waiting Foreman"
+              parent="menu_workshop_operations"
+              action="workshop_expense_action_pending"
+              sequence="43"
+              groups="workshop_management.group_workshop_supervisor"/>
+
+    <menuitem id="menu_workshop_credit_releases"
+              name="Credit Releases (Payment Pending)"
+              parent="menu_workshop_operations"
+              action="workshop_job_order_action_payment_pending"
+              sequence="45"
+              groups="workshop_management.group_workshop_supervisor"/>
+
+    <menuitem id="menu_workshop_quality_inspection"
+              name="Quality Inspections"
+              parent="menu_workshop_operations"
+              action="workshop_quality_inspection_action"
+              sequence="50"
+              groups="workshop_management.group_workshop_technician"/>
+
+    <!-- Master Data Category -->
+    <menuitem id="menu_workshop_master_data"
+              name="Master Data"
+              parent="menu_workshop_root"
+              sequence="20"
+              groups="workshop_management.group_workshop_technician,workshop_management.group_workshop_receptionist"/>
+
+    <menuitem id="menu_workshop_equipment"
+              name="Equipment/Vehicle Master"
+              parent="menu_workshop_master_data"
+              action="workshop_equipment_action"
+              sequence="10"/>
+
+    <menuitem id="menu_workshop_agreement"
+              name="Service Agreements"
+              parent="menu_workshop_master_data"
+              action="workshop_agreement_action"
+              sequence="15"
+              groups="workshop_management.group_workshop_technician"/>
+
+    <menuitem id="menu_workshop_warranties"
+              name="Service Warranties"
+              parent="menu_workshop_master_data"
+              action="workshop_warranty_action"
+              sequence="18"
+              groups="workshop_management.group_workshop_technician,workshop_management.group_workshop_receptionist"/>
+
+    <menuitem id="menu_workshop_task_master"
+              name="Task Master"
+              parent="menu_workshop_master_data"
+              action="workshop_task_master_action"
+              sequence="20"
+              groups="workshop_management.group_workshop_technician"/>
+
+    <!-- Reporting & Analytics Category -->
+    <menuitem id="menu_workshop_reporting"
+              name="Reporting &amp; Analytics"
+              parent="menu_workshop_root"
+              sequence="30"
+              groups="workshop_management.group_workshop_technician"/>
+
+    <menuitem id="menu_workshop_field_service_reporting"
+              name="Field Service Analytics"
+              parent="menu_workshop_reporting"
+              action="action_workshop_field_service_reporting"
+              sequence="15"/>
+
+    <menuitem id="menu_workshop_dashboard_process"
+              name="Process Pipeline Dashboard"
+              parent="menu_workshop_reporting"
+              action="action_workshop_job_order_reporting"
+              sequence="10"/>
+
+    <menuitem id="menu_workshop_tech_productivity"
+              name="Technician Productivity"
+              parent="menu_workshop_reporting"
+              action="action_workshop_technician_productivity"
+              sequence="20"/>
+
+    <menuitem id="menu_workshop_spare_reporting"
+              name="Spare Parts Consumption"
+              parent="menu_workshop_reporting"
+              action="action_workshop_spare_parts_reporting"
+              sequence="30"/>
+
+    <!-- Configuration Category -->
+    <menuitem id="menu_workshop_configuration"
+              name="Configuration"
+              parent="menu_workshop_root"
+              sequence="40"
+              groups="workshop_management.group_workshop_manager"/>
+
+    <menuitem id="menu_workshop_approval_rule"
+              name="Approval Rules"
+              parent="menu_workshop_configuration"
+              action="workshop_approval_rule_action"
+              sequence="10"/>
+
+    <menuitem id="menu_workshop_qi_checklist"
+              name="QI Checklist Templates"
+              parent="menu_workshop_configuration"
+              action="workshop_quality_checklist_item_action"
+              sequence="20"/>
+
+    <menuitem id="menu_workshop_equipment_type"
+              name="Equipment/Vehicle Types"
+              parent="menu_workshop_configuration"
+              action="workshop_equipment_type_action"
+              sequence="26"/>
+
+    <menuitem id="menu_workshop_work_type"
+              name="Types of Work"
+              parent="menu_workshop_configuration"
+              action="workshop_work_type_action"
+              sequence="27"/>
+
+    <menuitem id="menu_workshop_department"
+              name="Departments"
+              parent="menu_workshop_configuration"
+              action="workshop_department_action"
+              sequence="28"/>
+
+    <menuitem id="menu_workshop_warranty_rules"
+              name="Warranty Period Rules"
+              parent="menu_workshop_configuration"
+              action="workshop_warranty_rule_action"
+              sequence="29"/>
+
+    <menuitem id="menu_workshop_customer_type"
+              name="Customer Types"
+              parent="menu_workshop_configuration"
+              action="workshop_customer_type_action"
+              sequence="30"/>
+
+    <menuitem id="menu_workshop_labor_rate_rules"
+              name="Labor Rate Rules"
+              parent="menu_workshop_configuration"
+              action="workshop_labor_rate_rule_action"
+              sequence="31"/>
+
+    <menuitem id="menu_workshop_settings"
+              name="Settings"
+              parent="menu_workshop_configuration"
+              action="action_workshop_config_settings"
+              sequence="90"/>
+
+</odoo>

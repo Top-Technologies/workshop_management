@@ -1,0 +1,108 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+
+    <!-- =====================================================================
+         TASK MASTER – List View
+         ===================================================================== -->
+    <record id="workshop_task_master_view_list" model="ir.ui.view">
+        <field name="name">workshop.task.master.list</field>
+        <field name="model">workshop.task.master</field>
+        <field name="arch" type="xml">
+            <list string="Task Master">
+                <field name="code"/>
+                <field name="name"/>
+                <field name="department"/>
+                <field name="department_id" optional="hide"/>
+                <field name="estimated_hours"/>
+                <field name="is_warrantable" optional="show"/>
+                <field name="is_punch" optional="show"/>
+                <field name="warranty_kind" optional="hide"/>
+            </list>
+        </field>
+    </record>
+
+    <!-- =====================================================================
+         TASK MASTER – Form View
+         ===================================================================== -->
+    <record id="workshop_task_master_view_form" model="ir.ui.view">
+        <field name="name">workshop.task.master.form</field>
+        <field name="model">workshop.task.master</field>
+        <field name="arch" type="xml">
+            <form string="Task Master">
+                <sheet>
+                    <div class="oe_title">
+                        <label for="name"/>
+                        <h1>
+                            <field name="name" placeholder="e.g. Engine Overhaul"/>
+                        </h1>
+                    </div>
+                    <group>
+                        <group>
+                            <field name="code"/>
+                            <field name="department"/>
+                            <field name="department_id"/>
+                        </group>
+                        <group>
+                            <field name="estimated_hours"/>
+                            <field name="is_warrantable"/>
+                            <field name="warranty_kind" invisible="not is_warrantable"/>
+                            <field name="is_punch"/>
+                            <field name="active"/>
+                        </group>
+                    </group>
+                    <group string="Job Description">
+                        <field name="description" nolabel="1"
+                               placeholder="Describe the standard procedure…"/>
+                    </group>
+                </sheet>
+            </form>
+        </field>
+    </record>
+
+    <!-- =====================================================================
+         TASK MASTER – Search View
+         ===================================================================== -->
+    <record id="workshop_task_master_view_search" model="ir.ui.view">
+        <field name="name">workshop.task.master.search</field>
+        <field name="model">workshop.task.master</field>
+        <field name="arch" type="xml">
+            <search string="Search Jobs">
+                <field name="name" string="Job Description"
+                       filter_domain="['|', ('name', 'ilike', self), ('code', 'ilike', self)]"/>
+                <field name="department"/>
+                <field name="department_id"/>
+                <separator/>
+                <filter name="filter_archived" string="Archived"
+                        domain="[('active', '=', False)]"/>
+                <filter name="filter_warrantable" string="Warrantable Services"
+                        domain="[('is_warrantable', '=', True)]"/>
+                <group name="group_by">
+                    <filter name="group_department" string="Department"
+                            context="{'group_by': 'department'}"/>
+                    <filter name="group_hr_department" string="HR Department"
+                            context="{'group_by': 'department_id'}"/>
+                </group>
+            </search>
+        </field>
+    </record>
+
+    <!-- =====================================================================
+         TASK MASTER – Action
+         ===================================================================== -->
+    <record id="workshop_task_master_action" model="ir.actions.act_window">
+        <field name="name">Task Master</field>
+        <field name="res_model">workshop.task.master</field>
+        <field name="view_mode">list,form</field>
+        <field name="search_view_id" ref="workshop_task_master_view_search"/>
+        <field name="help" type="html">
+            <p class="o_view_nocontent_smiling_face">
+                Define your first job description
+            </p>
+            <p>
+                Create a catalogue of standard jobs and services
+                offered by your workshop.
+            </p>
+        </field>
+    </record>
+
+</odoo>

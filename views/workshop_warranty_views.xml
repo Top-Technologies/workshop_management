@@ -1,0 +1,184 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+
+    <record id="workshop_warranty_rule_view_list" model="ir.ui.view">
+        <field name="name">workshop.warranty.rule.list</field>
+        <field name="model">workshop.warranty.rule</field>
+        <field name="arch" type="xml">
+            <list string="Warranty Period Rules" editable="bottom">
+                <field name="sequence" widget="handle"/>
+                <field name="name"/>
+                <field name="warranty_kind"/>
+                <field name="duration_months"/>
+                <field name="equipment_type_id"/>
+                <field name="partner_id"/>
+                <field name="agreement_id"/>
+                <field name="active"/>
+                <field name="company_id" groups="base.group_multi_company"/>
+            </list>
+        </field>
+    </record>
+
+    <record id="workshop_warranty_rule_view_form" model="ir.ui.view">
+        <field name="name">workshop.warranty.rule.form</field>
+        <field name="model">workshop.warranty.rule</field>
+        <field name="arch" type="xml">
+            <form string="Warranty Period Rule">
+                <sheet>
+                    <group>
+                        <group>
+                            <field name="name"/>
+                            <field name="warranty_kind"/>
+                            <field name="duration_months"/>
+                            <field name="active"/>
+                        </group>
+                        <group>
+                            <field name="equipment_type_id"/>
+                            <field name="partner_id"/>
+                            <field name="agreement_id"/>
+                            <field name="sequence"/>
+                            <field name="company_id" groups="base.group_multi_company"/>
+                        </group>
+                    </group>
+                    <group string="Notes">
+                        <field name="notes" nolabel="1"
+                               placeholder="Most specific matching rule wins: agreement, then customer, then vehicle type, then default for the service."/>
+                    </group>
+                </sheet>
+            </form>
+        </field>
+    </record>
+
+    <record id="workshop_warranty_rule_action" model="ir.actions.act_window">
+        <field name="name">Warranty Period Rules</field>
+        <field name="res_model">workshop.warranty.rule</field>
+        <field name="view_mode">list,form</field>
+        <field name="help" type="html">
+            <p class="o_view_nocontent_smiling_face">
+                Define warranty durations
+            </p>
+            <p>
+                Periods vary by service (Engine Overhaul or Gearbox), vehicle type,
+                customer, and service agreement. Only those two services are warrantable.
+            </p>
+        </field>
+    </record>
+
+    <record id="workshop_warranty_view_list" model="ir.ui.view">
+        <field name="name">workshop.warranty.list</field>
+        <field name="model">workshop.warranty</field>
+        <field name="arch" type="xml">
+            <list string="Service Warranties"
+                  decoration-success="state == 'active'"
+                  decoration-muted="state == 'expired'"
+                  decoration-danger="state == 'cancelled'">
+                <field name="name"/>
+                <field name="equipment_id"/>
+                <field name="partner_id"/>
+                <field name="warranty_kind"/>
+                <field name="date_start"/>
+                <field name="date_end"/>
+                <field name="duration_months"/>
+                <field name="job_order_id"/>
+                <field name="state" widget="badge"
+                       decoration-success="state == 'active'"
+                       decoration-warning="state == 'expired'"
+                       decoration-danger="state == 'cancelled'"/>
+            </list>
+        </field>
+    </record>
+
+    <record id="workshop_warranty_view_search" model="ir.ui.view">
+        <field name="name">workshop.warranty.search</field>
+        <field name="model">workshop.warranty</field>
+        <field name="arch" type="xml">
+            <search string="Service Warranties">
+                <field name="name"/>
+                <field name="equipment_id"/>
+                <field name="partner_id"/>
+                <field name="job_order_id"/>
+                <filter string="Active" name="filter_active" domain="[('state', '=', 'active')]"/>
+                <filter string="Expired" name="filter_expired" domain="[('state', '=', 'expired')]"/>
+                <filter string="Cancelled" name="filter_cancelled" domain="[('state', '=', 'cancelled')]"/>
+                <separator/>
+                <filter string="Engine Overhaul" name="filter_engine"
+                        domain="[('warranty_kind', '=', 'engine_overhaul')]"/>
+                <filter string="Gearbox" name="filter_gearbox"
+                        domain="[('warranty_kind', '=', 'gearbox')]"/>
+                <group>
+                    <filter string="Status" name="group_state" context="{'group_by': 'state'}"/>
+                    <filter string="Service" name="group_kind" context="{'group_by': 'warranty_kind'}"/>
+                    <filter string="Customer" name="group_partner" context="{'group_by': 'partner_id'}"/>
+                    <filter string="Vehicle" name="group_equipment" context="{'group_by': 'equipment_id'}"/>
+                </group>
+            </search>
+        </field>
+    </record>
+
+    <record id="workshop_warranty_view_form" model="ir.ui.view">
+        <field name="name">workshop.warranty.form</field>
+        <field name="model">workshop.warranty</field>
+        <field name="arch" type="xml">
+            <form string="Service Warranty">
+                <header>
+                    <button name="action_cancel" type="object" string="Cancel Warranty"
+                            invisible="state != 'active'"
+                            groups="workshop_management.group_workshop_manager"/>
+                    <button name="action_reset_active" type="object" string="Reactivate"
+                            invisible="state != 'cancelled'"
+                            groups="workshop_management.group_workshop_manager"/>
+                    <field name="state" widget="statusbar" statusbar_visible="active,expired"/>
+                </header>
+                <sheet>
+                    <widget name="web_ribbon" title="Expired" bg_color="text-bg-warning"
+                            invisible="state != 'expired'"/>
+                    <div class="oe_title">
+                        <label for="name"/>
+                        <h1>
+                            <field name="name" readonly="1"/>
+                        </h1>
+                    </div>
+                    <group>
+                        <group string="Vehicle">
+                            <field name="equipment_id"/>
+                            <field name="partner_id"/>
+                            <field name="job_order_id"/>
+                            <field name="task_id" domain="[('is_warrantable', '=', True)]"/>
+                        </group>
+                        <group string="Period">
+                            <field name="warranty_kind"/>
+                            <field name="rule_id"/>
+                            <field name="agreement_id"/>
+                            <field name="date_start"/>
+                            <field name="duration_months"/>
+                            <field name="date_end"/>
+                            <field name="company_id" groups="base.group_multi_company"/>
+                            <field name="is_cancelled" invisible="1"/>
+                        </group>
+                    </group>
+                    <group string="Notes">
+                        <field name="notes" nolabel="1"/>
+                    </group>
+                </sheet>
+                <chatter/>
+            </form>
+        </field>
+    </record>
+
+    <record id="workshop_warranty_action" model="ir.actions.act_window">
+        <field name="name">Service Warranties</field>
+        <field name="res_model">workshop.warranty</field>
+        <field name="view_mode">list,form</field>
+        <field name="context">{'search_default_filter_active': 1}</field>
+        <field name="help" type="html">
+            <p class="o_view_nocontent_smiling_face">
+                No service warranties yet
+            </p>
+            <p>
+                Closing a Job Order for Engine Overhaul or Gearbox issues a warranty
+                whose length comes from the matching period rule.
+            </p>
+        </field>
+    </record>
+
+</odoo>

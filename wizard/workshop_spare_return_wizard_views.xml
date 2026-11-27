@@ -1,0 +1,34 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <record id="workshop_spare_return_wizard_view_form" model="ir.ui.view">
+        <field name="name">workshop.spare.return.wizard.form</field>
+        <field name="model">workshop.spare.return.wizard</field>
+        <field name="arch" type="xml">
+            <form string="Flag Parts for Return">
+                <group>
+                    <field name="spare_request_id" readonly="1"/>
+                    <field name="job_order_id" readonly="1"/>
+                </group>
+                <p class="text-muted">
+                    Flag unused leftovers, parts that do not fit, or defective / damaged items.
+                    Store will restock, scrap, or return them to the vendor, and can issue a replacement.
+                </p>
+                <field name="line_ids">
+                    <list editable="bottom" create="false" delete="false">
+                        <field name="spare_line_id" column_invisible="1"/>
+                        <field name="product_id"/>
+                        <field name="qty_remaining"/>
+                        <field name="qty"/>
+                        <field name="reason"/>
+                        <field name="request_replacement"/>
+                        <field name="notes"/>
+                    </list>
+                </field>
+                <footer>
+                    <button name="action_flag" string="Flag for Store" type="object" class="btn-primary"/>
+                    <button string="Discard" special="cancel"/>
+                </footer>
+            </form>
+        </field>
+    </record>
+</odoo>
